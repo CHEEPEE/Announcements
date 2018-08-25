@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Admin Announcement Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="assets/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="assets/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="assets/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script crossorigin src="assets/react.development.js"></script>
+    <script crossorigin src="assets/react-dom.development.js"></script>
+    <script src="assets/babel.min.js"></script>
+    <style media="screen">
+        .businessImage{
+          width: 150px;
+          height: 150px;
+        }
+      
+        .text-small{
+          font-size: 12px;
+        }
+        .user-account-image{
+          width: 30px;
+          height: 30px;
+        }
+        .modal-backdrop {
+          display: none!important;
+        }
+        .van-image{
+          width: 400px;
+        }
+        .height-zero{
+          height:0px !important;
+          overflow: hidden !important;
+        }
+        html{
+            height: 100%;
+        }
+        .main{
+            padding: 0px;
+        }
+        .active{
+            background: #254465 !important;
+        }
+        .menu{
+            padding-left: 30px;
+        }
+        </style>
+</head>
+<body class="h-100">
+   
+    <div class="row h-100">
+        <div class="col-sm-2 pt-3 main h-100 bg-white">
+          
+            
+          </div>
+        <div class="col-sm-2 position-fixed pt-3 main h-100 bg-dark">
+            <h3 class = "pl-4 text-white pb-3">Control Panel</h3>
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="menu nav-link text-white border-0 active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true" onclick="manageAnnouncements()">Announcement</div>
+                <div class="menu nav-link text-white border-0" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false" onclick = "manageCategory()">Manage Category</div>
+                <div class="menu nav-link text-white border-0" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">TV Announcement</div>
+                <div class="menu nav-link text-white border-0" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Accout Setting</div>
+            </div>
+        </div>
+       
+        <div class="col-sm-10 bg-white main">
+                <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                        <a class="navbar-brand" href="">Announcement Web Application</a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                          <span class="navbar-toggler-icon"></span>
+                        </button>
+                      
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                          <ul class="navbar-nav mr-auto">
+                          
+                          </ul>
+                          <form class="form-inline my-2 pl-5 my-lg-0">
+                            <div class="nav-item dropdown  pl-3">
+                              <div class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Acocunt User Name
+                              </div>
+                              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                              </div>
+                            </div>
+                          </form>
+                     </div>
+             </nav>
+             <div class="m-3" id="mainContainer">
+
+             </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyC9iHb5ontmzw2aoKBre1A9_bK5skD0Gqw",
+        authDomain: "announcementsystem-19c49.firebaseapp.com",
+        databaseURL: "https://announcementsystem-19c49.firebaseio.com",
+        projectId: "announcementsystem-19c49",
+        storageBucket: "announcementsystem-19c49.appspot.com",
+        messagingSenderId: "703465160774"
+      };
+  const firebaseApp = firebase.initializeApp(config);
+  const ref = firebaseApp.firestore()
+  ref.settings({timestampsInSnapshots: true})
+</script>
+    <script type="text/babel" src="index.js"></script>
+    <script type="text/babel" src="manageCategory.js"></script>
+</body>
+</html>

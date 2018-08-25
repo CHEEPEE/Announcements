@@ -1,1 +1,1 @@
-Announcements
+AnnouncementWebApp
