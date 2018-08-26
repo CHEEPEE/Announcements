@@ -90,7 +90,8 @@ class AnnouncementItem extends React.Component {
 
 class AddAnnouncements extends React.Component {
     state = {
-        imagePath:""
+        imagePath:"",
+        loadingState:""
     }
     getCategories(){
         ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
@@ -128,7 +129,8 @@ class AddAnnouncements extends React.Component {
             $("#announcementCaption").val("");
             $("#announcementDetails").val("");
             sup.setState({
-                imagePath:""
+                imagePath:"",
+                loadingState:""
             })    
         
         })
@@ -153,6 +155,9 @@ class AddAnnouncements extends React.Component {
             // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
             var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
             console.log('Upload is ' + progress + '% done');
+            superb.setState({
+                loadingState:'Upload is ' + progress + '% done'
+            })
             switch (snapshot.state) {
               case firebase.storage.TaskState.PAUSED: // or 'paused'
                 console.log('Upload is paused');
@@ -221,6 +226,9 @@ class AddAnnouncements extends React.Component {
                   <div className = "col-sm-12">
                   <img className = "w-100" id = "imageToUpload" src ={this.state.imagePath} />
                   </div>
+                </div>
+                <div className = "row">
+                    {this.state.loadingState}
                 </div>
                 <div className="row pr-5 mt-3">
                 <div class="form-group w-100">

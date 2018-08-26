@@ -3,7 +3,7 @@ const root = document.getElementById("root");
 function renderRoot() {
   ReactDOM.render(
     <React.Fragment>
-      <div className="col-lg-4 d-none d-lg-block bg-white h-100 col-sm-12 pt-5">
+      <div className="col-lg-4 d-none d-lg-block col-sm-12 pt-5">
         <SideNav />
       </div>
 
@@ -43,7 +43,10 @@ class SideNav extends React.Component {
   }
   render() {
     return (
-      <div class="list-group d-none d-lg-block position-fixed" id="sideMenus" role="tablist" />
+      <div className = "h-100 d-none d-lg-block bg-white p-5 position-fixed">
+        <div class="list-group" id="sideMenus" role="tablist" />
+      </div>
+    
     );
   }
 }
@@ -82,17 +85,63 @@ class BotNav extends React.Component {
             menu: this.state.menu == "Menu"? "Close":"Menu"
         })
     }
+    getAnnouncements() {
+      ReactDOM.render(
+      <React.Fragment>Announcements</React.Fragment>,
+      document.querySelector("#AnnouncementsCategoryName")
+       );
+      ReactDOM.render(
+        <React.Fragment>No Announcements</React.Fragment>,
+        document.querySelector("#annoucementsList")
+      );
+      ref.collection("announcements").orderBy("timestamp").onSnapshot(function(querySnapshot) {
+        let categoryObjects = [];
+        querySnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+  
+          var details = doc.data().announcementDetails;
+          console.log(details);
+          let repdetails = details;
+          let obj = {
+            key: doc.data().key,
+            announcementCaption: doc.data().announcementCaption,
+            announcementDetails: repdetails,
+            imagePath:doc.data().imagePath
+          };
+          categoryObjects.push(obj);
+        });
+        categoryObjects.reverse();
+        var listItem = categoryObjects.map(object => (
+          <AnnouncementItem
+            key={object.key}
+            id={object.key}
+            caption={object.announcementCaption}
+            des={object.announcementDetails}
+            imagePath = {object.imagePath}
+          />
+        ));
+        ReactDOM.render(
+          <React.Fragment>{listItem}</React.Fragment>,
+          document.querySelector("#annoucementsList")
+        );
+      });
+    }
     render() {
       return (
         <div className = "w-100 d-lg-none fixed-bottom bg-dark p-2">
             <div className = "row text-white ml-2 mb-2" onClick = {this.botMenuExtend.bind(this)}>
            <div className = "align-middle">{this.state.menu}</div>
             </div>
-            <div className = {"row "+this.state.botMenuExtend} id = "botMenus">
+          <div className = {"pl-1 "+this.state.botMenuExtend}>
+          <div className = "row text-white ml-2 mb-2" onClick ={this.getAnnouncements.bind(this)}>
+             <div className = "align-middle">Announcements</div>
+          </div>
+            <div className = "row" id = "botMenus">
                 <div className = "col pl-4 mt-3 text-white">
                 Loading . . .
                 </div>
             </div>
+          </div>
         </div>
       );
     }
@@ -113,9 +162,12 @@ class SideNavMenuItem extends React.Component {
 }
 class BotMenuItems extends React.Component {
     state = {};
+    getAnnouncementsBasedCat(){
+      getAnnouncements(this.props.id,this.props.categoryName);
+    }
     render() {
       return (
-        <a
+        <a onClick = {this.getAnnouncementsBasedCat.bind(this)}
           className="list-group-item text-white bg-dark border-0 rounded-0 list-group-item-action"
           href="#"
           data-toggle="list"
@@ -129,6 +181,10 @@ class BotMenuItems extends React.Component {
 class MainRoot extends React.Component {
   state = {};
   getAnnouncements() {
+    ReactDOM.render(
+      <React.Fragment>No Announcements</React.Fragment>,
+      document.querySelector("#annoucementsList")
+    );
     ref.collection("announcements").orderBy("timestamp").onSnapshot(function(querySnapshot) {
       let categoryObjects = [];
       querySnapshot.forEach(function(doc) {
@@ -168,15 +224,17 @@ class MainRoot extends React.Component {
     return (
       <React.Fragment>
         <div className="row">
-        <h1 className = "text-dark font-weight-light">{this.props.category}</h1>
+        <h1 className = "text-dark font-weight-light pl-3" id = "AnnouncementsCategoryName">{this.props.category}</h1>
         </div>
-        <div className="row">
+        <div className="row pb-5">
           <div class="list-group" id="annoucementsList" role="tablist" />
         </div>
       </React.Fragment>
     );
   }
 }
+
+
 
 class AnnouncementItem extends React.Component {
   state = {};
@@ -189,7 +247,7 @@ class AnnouncementItem extends React.Component {
           <div className="row">
             <small></small>
           </div>
-          <div className="row text-dark">
+          <div className="row text-info text-capitalize">
             <h5>{this.props.caption}</h5>
           </div>
         </div>
@@ -213,3 +271,46 @@ class AnnouncementItem extends React.Component {
 }
 
 renderRoot();
+
+function getAnnouncements(categoryid,categoryName){
+  AnnouncementsCategoryName
+  ReactDOM.render(
+    <React.Fragment>No Announcements</React.Fragment>,
+    document.querySelector("#annoucementsList")
+     );
+     ReactDOM.render(
+      <React.Fragment>{categoryName}</React.Fragment>,
+      document.querySelector("#AnnouncementsCategoryName")
+       );
+    ref.collection("announcements").where("categoryOptions", "==", categoryid).orderBy("timestamp").onSnapshot(function(querySnapshot) {
+      let categoryObjects = [];
+      querySnapshot.forEach(function(doc) {
+        // doc.data() is never undefined for query doc snapshots
+
+        var details = doc.data().announcementDetails;
+        console.log(details);
+        let repdetails = details;
+        let obj = {
+          key: doc.data().key,
+          announcementCaption: doc.data().announcementCaption,
+          announcementDetails: repdetails,
+          imagePath:doc.data().imagePath
+        };
+        categoryObjects.push(obj);
+      });
+      categoryObjects.reverse();
+      var listItem = categoryObjects.map(object => (
+        <AnnouncementItem
+          key={object.key}
+          id={object.key}
+          caption={object.announcementCaption}
+          des={object.announcementDetails}
+          imagePath = {object.imagePath}
+        />
+      ));
+      ReactDOM.render(
+        <React.Fragment>{listItem}</React.Fragment>,
+        document.querySelector("#annoucementsList")
+      );
+    });
+}
