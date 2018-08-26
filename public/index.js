@@ -7,7 +7,7 @@ function renderRoot() {
         <SideNav />
       </div>
 
-      <div className="col-lg-7 ml-3 col-sm-12 pt-5">
+      <div className="col-lg-7 p-3 col-sm-12 pt-5">
         <MainRoot category={"Announcements"} />
         <BotNav/>
       </div>
@@ -129,7 +129,7 @@ class BotMenuItems extends React.Component {
 class MainRoot extends React.Component {
   state = {};
   getAnnouncements() {
-    ref.collection("announcements").onSnapshot(function(querySnapshot) {
+    ref.collection("announcements").orderBy("timestamp").onSnapshot(function(querySnapshot) {
       let categoryObjects = [];
       querySnapshot.forEach(function(doc) {
         // doc.data() is never undefined for query doc snapshots
@@ -140,17 +140,19 @@ class MainRoot extends React.Component {
         let obj = {
           key: doc.data().key,
           announcementCaption: doc.data().announcementCaption,
-          announcementDetails: repdetails
+          announcementDetails: repdetails,
+          imagePath:doc.data().imagePath
         };
         categoryObjects.push(obj);
       });
-
+      categoryObjects.reverse();
       var listItem = categoryObjects.map(object => (
         <AnnouncementItem
           key={object.key}
           id={object.key}
           caption={object.announcementCaption}
           des={object.announcementDetails}
+          imagePath = {object.imagePath}
         />
       ));
       ReactDOM.render(
@@ -180,7 +182,9 @@ class AnnouncementItem extends React.Component {
   state = {};
   render() {
     return (
-      <div className="list-group-item text-dark w-100 bg-white shadow-sm border-0 mt-3 list-group-item-action flex-column align-items-start">
+      <React.Fragment>
+    
+      <div className="list-group-item-action list-group-item text-dark w-100 bg-white shadow-sm border-0 mt-3 flex-column align-items-start">
         <div className="font-weight-bold text-info pl-3">
           <div className="row">
             <small></small>
@@ -189,6 +193,9 @@ class AnnouncementItem extends React.Component {
             <h5>{this.props.caption}</h5>
           </div>
         </div>
+        
+        <img className = "w-100 rounded shadow-sm mt-2 mb-2" style = {{height:'auto'}} src = {this.props.imagePath} />
+    
         <div className="text-dark pl-3 pr-3">
           <div className="row">
             <small className="text-info"></small>
@@ -200,6 +207,7 @@ class AnnouncementItem extends React.Component {
           </div>
         </div>
       </div>
+      </React.Fragment>
     );
   }
 }
