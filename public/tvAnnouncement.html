@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Admin Announcement Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="assets/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="assets/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="assets/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <script crossorigin src="assets/react.development.js"></script>
+    <script crossorigin src="assets/react-dom.development.js"></script>
+    <script src="assets/babel.min.js"></script>
+    <style>
+   
+     html{
+            height: 100%;
+        }
+        *{
+        margin: 0px !important;
+        padding: 0px !important;
+    }
+    
+    </style>
+</head>
+<body class="container-fluid h-100 bg-light">
+<div class="row w-100 h-100" id = "app">
+</div>
+  
+
+</body>
+<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyC9iHb5ontmzw2aoKBre1A9_bK5skD0Gqw",
+    authDomain: "announcementsystem-19c49.firebaseapp.com",
+    databaseURL: "https://announcementsystem-19c49.firebaseio.com",
+    projectId: "announcementsystem-19c49",
+    storageBucket: "announcementsystem-19c49.appspot.com",
+    messagingSenderId: "703465160774"
+  };
+const firebaseApp = firebase.initializeApp(config);
+const ref = firebaseApp.firestore()
+ref.settings({timestampsInSnapshots: true})
+</script>
+<script type="text/babel" src="tv.js"></script>
+</html>

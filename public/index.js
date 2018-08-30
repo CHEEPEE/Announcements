@@ -148,9 +148,12 @@ class BotNav extends React.Component {
   }
 class SideNavMenuItem extends React.Component {
   state = {};
+  getAnnouncementsBasedCat(){
+    getAnnouncements(this.props.id,this.props.categoryName);
+  }
   render() {
     return (
-      <a
+      <a onClick = {this.getAnnouncementsBasedCat.bind(this)}
         className="list-group-item border-0 rounded-0 list-group-item-action"
         href="#"
         data-toggle="list"
