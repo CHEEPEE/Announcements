@@ -160,11 +160,41 @@ class CategoryList extends React.Component {
 
 class CategoryItems extends React.Component {
     state = {  }
+
+    delete(){
+        ref.collection("announcementCategory").doc(this.props.id).delete();
+    }
+    deleteConfirm(){
+        var txt;
+        if (confirm("Confirm Delete?")) {
+            this.delete();
+        } else {
+            
+        }
+    }
+
+    updateCategoryName(){
+        let updatedCategoryName = prompt("Please enter your name", this.props.categoryName);
+        if(updatedCategoryName != null){
+            ref.collection("announcementCategory").doc(this.props.id).update({
+                categoryName:updatedCategoryName
+            });
+        }
+    }
+    
     render() { 
         return ( 
         
         <div className="list-group-item text-dark font-weight-bold w-100 bg-light border-0 mt-3 list-group-item-action flex-column align-items-start">
-            {this.props.categoryName}
+           <div className = "row">
+            <div className = "col">
+              {this.props.categoryName}
+            </div>
+            <div className = "col d-flex flex-row-reverse">
+            <button type="button" onClick = {this.updateCategoryName.bind(this)} class="btn ml-2 btn-info">Update</button>
+             <button type="button" onClick = {this.deleteConfirm.bind(this)} class="btn btn-danger">Delete</button>
+            </div>
+           </div>
         </div>
          );
     }

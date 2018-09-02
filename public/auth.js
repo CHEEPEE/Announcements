@@ -1,38 +1,42 @@
 //  var server = "http://localhost:5000";
 // server = "https://group5antique.firebaseapp.com";
-
-firebase.auth().onAuthStateChanged(function(user) {
+var email = "";
+var userId = "";
+var categoryId = "";
+firebaseApp.auth().onAuthStateChanged(function(user) {
   if (user) {
     // User is signed in.
 
-    var user = firebase.auth().currentUser;
+    var user = firebaseApp.auth().currentUser;
     //  var userId = user.uid;
     var cashierNumber;
-    if (window.location.hostname == "localhost") {
-      console.log(window.location.hostname);
-      if (
-        window.location.href !="http://"+window.location.hostname+":"+window.location.port+ "/admin/"
-      )
-       {
-        window.location.href =
-          "/admin/";
+
+    ref.collection("accounts").doc(user.uid).onSnapshot(function(querySnapshot) {
+      console.log(querySnapshot.data());
+      if(querySnapshot.data().userType == "admin"){
+        goToAdmin();
       }
-    } else {
-      if (
-        window.location.href !=
-        "announcementsystem-19c49.firebaseapp.com"
-      ) {
-        window.location.href = "/admin/";
+      else if(querySnapshot.data().userType == "subAdmin"){
+
+        goTosubadmin();
+        categoryId = querySnapshot.data().categoryId;
       }
-    }
+     });
+
 
     if (user != null) {
       console.log("user identified");
+      console.log(user.email);
       // var userId = firebase.auth().currentUser.uid;
       // return firebase.database().ref('/user/' + userId+'/cashier_number').once('value').then(function(snapshot) {
       // localStorage.cashiernumber = snapshot.val();
       // });
-      var email_id = user.email;
+       email = user.email;
+       userId = user.userId;
+       document.getElementById("userAccountEmail").innerHTML = user.email
+
+       
+
       // if (window.location.href != "http://localhost:5000/index.html" || window.location.href != "http://localhost:5000/index.html" ) {
       //     window.location.href = "index.html";
       // }
@@ -62,7 +66,7 @@ function login() {
   var userEmail = document.getElementById("email").value;
   var userPass = document.getElementById("password").value;
 
-  firebase
+  firebaseApp
     .auth()
     .signInWithEmailAndPassword(userEmail, userPass)
     .catch(function(error) {
@@ -75,6 +79,48 @@ function login() {
 }
 
 function logout() {
-  firebase.auth().signOut();
+  firebaseApp.auth().signOut();
   console.log("logout");
+}
+
+function goToAdmin(){
+  if (window.location.hostname == "localhost") {
+    
+
+    if (
+      window.location.href !="http://"+window.location.hostname+":"+window.location.port+ "/admin/"
+    )
+     {
+      window.location.href =
+        "/admin/";
+    }
+  } else {
+    if (
+      window.location.href !=
+      "announcementsystem-19c49.firebaseapp.com"
+    ) {
+      window.location.href = "/admin/";
+    }
+  }
+}
+
+function goTosubadmin(){
+  if (window.location.hostname == "localhost") {
+    
+
+    if (
+      window.location.href !="http://"+window.location.hostname+":"+window.location.port+ "/subadmin/"
+    )
+     {
+      window.location.href =
+        "/subadmin/";
+    }
+  } else {
+    if (
+      window.location.href !=
+      "announcementsystem-19c49.firebaseapp.com"
+    ) {
+      window.location.href = "/subadmin/";
+    }
+  }
 }

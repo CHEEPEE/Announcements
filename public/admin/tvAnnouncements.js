@@ -32,7 +32,7 @@ class TVAnnouncementContainer extends React.Component {
                     TV Announcements
                 </div>
                 <div className = "row">
-
+                    
                 </div>
             </React.Fragment>
          );

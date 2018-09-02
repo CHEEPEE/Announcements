@@ -11,6 +11,10 @@ class AnnouncementsComtainer extends React.Component {
     tvAnnouncementStats: "text-black-50 p-2"
   };
   getAnnouncements() {
+    ReactDOM.render(
+      <AddAnnouncements type = {"announcement"}/>,
+      document.querySelector("#funtionContainer")
+    )
     ref
       .collection("announcements")
       .where("announcementType", "==", "announcement")
@@ -27,7 +31,8 @@ class AnnouncementsComtainer extends React.Component {
             key: doc.data().key,
             announcementCaption: doc.data().announcementCaption,
             announcementDetails: repdetails,
-            imagePath: doc.data().imagePath
+            imagePath: doc.data().imagePath,
+            categoryOptions:doc.data().categoryOptions
           };
           categoryObjects.push(obj);
         });
@@ -36,6 +41,7 @@ class AnnouncementsComtainer extends React.Component {
           <AnnouncementItem
             key={object.key}
             id={object.key}
+            categoryId = {object.categoryOptions}
             caption={object.announcementCaption}
             des={object.announcementDetails}
             imagePath={object.imagePath}
@@ -45,10 +51,13 @@ class AnnouncementsComtainer extends React.Component {
           <React.Fragment>{listItem}</React.Fragment>,
           document.querySelector("#announcementsList")
         );
-       
       });
   }
   getTVAnnouncements() {
+    ReactDOM.render(
+      <AddAnnouncements type = {"TVannouncement"}/>,
+      document.querySelector("#funtionContainer")
+    )
     ref
       .collection("announcements")
       .where("announcementType", "==", "TVannouncement")
@@ -59,7 +68,7 @@ class AnnouncementsComtainer extends React.Component {
           // doc.data() is never undefined for query doc snapshots
 
           var details = doc.data().announcementDetails;
-          console.log(details);
+
           let repdetails = details;
           let obj = {
             key: doc.data().key,
@@ -70,72 +79,68 @@ class AnnouncementsComtainer extends React.Component {
           categoryObjects.push(obj);
         });
         categoryObjects.reverse();
-        var listItem = categoryObjects.map(function(object,index){
-            let active ="";
-            if(index == 0){
-                active = "active";
-            }   
-             
-            return <TVitem
-                key={object.key}
-                id={object.key}
-                caption={object.announcementCaption}
-                des={object.announcementDetails}
-                imagePath={object.imagePath}
-                active = {active}
+        var listItem = categoryObjects.map(function(object, index) {
+          let active = "";
+          if (index == 0) {
+            active = "active";
+          }
+
+          return (
+            <TVitem
+              key={object.key}
+              id={object.key}
+              caption={object.announcementCaption}
+              des={object.announcementDetails}
+              imagePath={object.imagePath}
+              active={active}
             />
-        }
-        );
-        var picItem = categoryObjects.map(function(object,index){
-            let active ="";
-            if(index == 0){
-                active = "active";
-            }else{
-                active = "";
-            }  
-             
-            return <PictureItem
-                key={object.key}
-                id={object.key}
-                caption={object.announcementCaption}
-                des={object.announcementDetails}
-                imagePath={object.imagePath}
-                active = {active}
+          );
+        });
+        var picItem = categoryObjects.map(function(object, index) {
+          let active = "";
+          if (index == 0) {
+            active = "active";
+          } else {
+            active = "";
+          }
+
+          return (
+            <PictureItem
+              key={object.key}
+              id={object.key}
+              caption={object.announcementCaption}
+              des={object.announcementDetails}
+              imagePath={object.imagePath}
+              active={active}
             />
-        }
-        );
+          );
+        });
 
         ReactDOM.render(
-         <React.Fragment>
-              <div
-            id="carouselExampleControls"
-            className="carousel slide"
-            data-ride="carousel"
-          >
-            <div className="carousel-inner">{listItem}</div>
-          </div>
+          <React.Fragment>
+            <div
+              id="carouselExampleControls"
+              className="carousel slide"
+              data-ride="carousel"
+            >
+              <div className="carousel-inner">{listItem}</div>
+            </div>
 
-          <div className ="row mt-3 pl-3 ">
-            <h3 className ="text-muted">Slider Items</h3>
-          </div>
-          <div className ="container-fluid" id = "picItemsContainer">
-
-          </div>
-         </React.Fragment>
-          ,
+            <div className="row mt-3 pl-3 ">
+              <h3 className="text-muted">Slider Items</h3>
+            </div>
+            <div className="container-fluid" id="picItemsContainer" />
+          </React.Fragment>,
           document.querySelector("#announcementsList")
         );
 
         ReactDOM.render(
-            <React.Fragment>
-               {picItem}
-            </React.Fragment>
-             ,
-             document.querySelector("#picItemsContainer")
-           );
-        $('.carousel').carousel({
-            interval: 2000
-          })
+          <React.Fragment>{picItem}</React.Fragment>,
+          document.querySelector("#picItemsContainer")
+        );
+        $(".carousel").carousel({
+          interval: 2000
+        });
       });
   }
   setAnnouncementActive() {
@@ -177,12 +182,18 @@ class AnnouncementsComtainer extends React.Component {
               </h3>
             </div>
           </div>
+          <div className="row p-2">
+            <div class="form-group w-25">
+              <label for="exampleFormControlSelect1"><small>Category</small></label>
+              <select class="form-control w-100" id="categoryForFilter" />
+            </div>
+          </div>
           <div className="row">
             <div className="list-group w-100 mr-4" id="announcementsList" />
           </div>
         </div>
         <div className="col-sm-5 mt-3" id="funtionContainer">
-          <AddAnnouncements />
+          <AddAnnouncements type = {"announcement"} />
         </div>
       </div>
     );
@@ -190,15 +201,40 @@ class AnnouncementsComtainer extends React.Component {
 }
 
 class AnnouncementItem extends React.Component {
-  state = {deleteEx:"d-none"};
-
-  extendDelete(){
-      this.setState({
-          deleteEx: this.state.deleteEx == "d-none"? "visible":"d-none"
-      })
+  state = {
+    deleteEx: "d-none",
+    departmentName: "",
+  
+  };
+  getCategoryName() {
+    let sup = this;
+  
+      ref
+        .collection("announcementCategory")
+        .doc(this.props.categoryId)
+        .onSnapshot(function(querySnapshot) {
+          console.log(querySnapshot.data().categoryName);
+          sup.setState({
+            departmentName: querySnapshot.data().categoryName
+            
+          });
+        });
+    
   }
-  deleteAnnouncement(){
-      ref.collection("announcements").doc(this.props.id).delete();
+
+  extendDelete() {
+    this.setState({
+      deleteEx: this.state.deleteEx == "d-none" ? "visible" : "d-none"
+    });
+  }
+  deleteAnnouncement() {
+    ref
+      .collection("announcements")
+      .doc(this.props.id)
+      .delete();
+  }
+  componentDidMount(){
+    this.getCategoryName();
   }
   render() {
     return (
@@ -222,26 +258,35 @@ class AnnouncementItem extends React.Component {
 
         <div className="row pl-3">
           <div className="col-sm-12">
-            <small className="text-info">Announcement</small>
+            <small className="text-muted">Announcement / {this.state.departmentName} </small>
           </div>
           <div className="col-sm-12">{this.props.des}</div>
         </div>
-        <div className = "row pl-3">
-        <button type="button" class="btn btn-danger" 
-        
-        onClick ={this.extendDelete.bind(this)}
-        >Delete</button>
+        <div className="row pl-3">
+          <button
+            type="button"
+            class="btn btn-danger m-3"
+            onClick={this.extendDelete.bind(this)}
+          >
+            Delete
+          </button>
         </div>
-        <div className = "row pl-3 w-100 mt-1">
-
-        <div class={"alert alert-danger w-100 "+this.state.deleteEx}role="alert">
-            <div className ="row">
-            <div className = "col">
-            Are you sure you want to delete this?
-            </div> <div className onClick = {this.deleteAnnouncement.bind(this)} className = "col text-right  text-primary">Yes</div>
+        <div className="row pl-3 w-100 mt-1">
+          <div
+            class={"alert alert-danger w-100 " + this.state.deleteEx}
+            role="alert"
+          >
+            <div className="row">
+              <div className="col">Are you sure you want to delete this?</div>{" "}
+              <div
+                className
+                onClick={this.deleteAnnouncement.bind(this)}
+                className="col text-right  text-primary"
+              >
+                Yes
+              </div>
             </div>
-        </div>
-
+          </div>
         </div>
       </div>
     );
@@ -251,7 +296,8 @@ class AnnouncementItem extends React.Component {
 class AddAnnouncements extends React.Component {
   state = {
     imagePath: "",
-    loadingState: ""
+    loadingState: "",
+    type:this.props.type
   };
   getCategories() {
     ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
@@ -282,7 +328,7 @@ class AddAnnouncements extends React.Component {
     let announcementDetails = $("#announcementDetails").val();
     let details = announcementDetails;
     let categoryOptions = $("#categoryOptions").val();
-    let announcementType = $("#announcementType").val();
+    let announcementType = this.props.type;
     let pushKey = ref.collection("announcements").doc().id;
     ref
       .collection("announcements")
@@ -307,7 +353,6 @@ class AddAnnouncements extends React.Component {
       .catch(function(error) {
         console.error("Error adding document: ", error);
       });
-
   }
   componentDidMount() {
     this.getCategories();
@@ -362,9 +407,9 @@ class AddAnnouncements extends React.Component {
     return (
       <React.Fragment>
         <div className="row pr-5">
-          <h3 className="text-dark">Add Announcements</h3>
+          <h3 className="text-dark">Add {this.props.type}</h3>
         </div>
-        <div className="row pr-5 mt-3">
+        {/* <div className="row pr-5 mt-3">
           <div class="form-group w-100">
             <label for="exampleFormControlSelect1">Announcement Type</label>
             <select class="form-control w-100" id="announcementType">
@@ -372,7 +417,7 @@ class AddAnnouncements extends React.Component {
               <option value="TVannouncement">TV Announcement</option>
             </select>
           </div>
-        </div>
+        </div> */}
         <div className="row pr-5  mt-3">
           <div className="form-group w-100">
             <label className="text-secondary" for="exampleInputEmail1">
@@ -462,20 +507,19 @@ class OptionItem extends React.Component {
 
 class TVitem extends React.Component {
   state = {
-      active:this.props.active
+    active: this.props.active
   };
   render() {
     return (
-      <div class={"carousel-item "+this.state.active}>
+      <div class={"carousel-item " + this.state.active}>
         <div
           className="d-block height300 w-100"
-         
           alt="First slide"
-          style = {{
-              backgroundImage:"url(" + this.props.imagePath + ")",
-              backgroundSize:"cover",
-              backgroundPosition:"center"
-        }}
+          style={{
+            backgroundImage: "url(" + this.props.imagePath + ")",
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          }}
         />
       </div>
     );
@@ -483,52 +527,63 @@ class TVitem extends React.Component {
 }
 
 class PictureItem extends React.Component {
-    state = {
-        active:this.props.active,
-        deleteEx:"d-none"
-    };
+  state = {
+    active: this.props.active,
+    deleteEx: "d-none"
+  };
 
-    extendDelete(){
-        this.setState({
-            deleteEx  : this.state.deleteEx == "d-none"? "visible":"d-none"
-        })
-    }
-    deleteAnnouncement(){
-        ref.collection("announcements").doc(this.props.id).delete();
-    }
-    render() {
-      return (
-       <div className = "row mt-3">
-            <div
-                    className="d-block height300 w-100"
-                    
-                    alt="First slide"
-                    style = {{
-                        backgroundImage:"url(" + this.props.imagePath + ")",
-                        backgroundSize:"cover",
-                        backgroundPosition:"center"
-                    }}
-             >
-            <div className = "row">
-                <div className ="col">
-                <button type="button" class="btn btn-danger m-3" onClick ={this.extendDelete.bind(this)}>Delete</button>
-                </div>
-                <div className ="col">
-                <div class={"alert alert-danger m-3 "+this.state.deleteEx} role="alert">
-                   <div className ="row ">
-                    <div className = "col">
-                    Delete Slider Item?
-                    </div>
-                    <div className = "col text-right text-primary" onClick = {this.deleteAnnouncement.bind(this)}>
-                    Yes
-                    </div>
-                   </div>
-                </div>
-                </div>
-            </div>
-            
-             </div>
-       </div>
-      );
-    }
+  extendDelete() {
+    this.setState({
+      deleteEx: this.state.deleteEx == "d-none" ? "visible" : "d-none"
+    });
   }
+  deleteAnnouncement() {
+    ref
+      .collection("announcements")
+      .doc(this.props.id)
+      .delete();
+  }
+  render() {
+    return (
+      <div className="row mt-3">
+        <div
+          className="d-block height300 w-100"
+          alt="First slide"
+          style={{
+            backgroundImage: "url(" + this.props.imagePath + ")",
+            backgroundSize: "cover",
+            backgroundPosition: "center"
+          }}
+        >
+          <div className="row">
+            <div className="col">
+              <button
+                type="button"
+                class="btn btn-danger m-3"
+                onClick={this.extendDelete.bind(this)}
+              >
+                Delete
+              </button>
+            </div>
+            <div className="col">
+              <div
+                class={"alert alert-danger m-3 " + this.state.deleteEx}
+                role="alert"
+              >
+                <div className="row ">
+                  <div className="col">Delete Slider Item?</div>
+                  <div
+                    className="col text-right text-primary"
+                    onClick={this.deleteAnnouncement.bind(this)}
+                  >
+                    Yes
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}

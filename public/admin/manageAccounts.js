@@ -2,7 +2,7 @@ function manageAccounts() {
   ReactDOM.render(
     <React.Fragment>
       <div className="row m-2">
-        <div className="col">
+        <div className="col" id = "mainContent">
           <AccountsComponent />
         </div>
         <div className="col" id="featuresColumn">
@@ -37,38 +37,24 @@ class AccountCreateForm extends React.Component {
       );
     });
   }
-  createAccount() {
+  createAccount(){
     let email = $("#userEmail").val();
     let password = $("#userPassword").val();
-    firebase
-      .auth()
-      .createUserWithEmailAndPassword(email, password)
-      .then(function() {
-        console.log("Account Created");
-        firebase
-          .auth()
-          .sendPasswordResetEmail(email)
-          .then(function() {
-            // Email sent.
-          })
-          .catch(function(error) {
-            // An error happened.
-          });
-      })
-      .catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // ...
-      });
+    ref.collection("users").doc("createUser").update({
+      email:email,
+      password:password
+    }).then(function(){
+      $("#userEmail").val("");
+      $("#userPassword").val("");
+    });
   }
   render() {
     return (
-      <React.Fragment>
-        <div className="row pr-5">
+      <div className = "container-fluid m-1 p-3 shadow">
+        <div className="row pr-5 pl-3">
           <h3 className="text-dark">Create Account</h3>
         </div>
-        <div className="row pr-5  mt-3">
+        <div className="row pr-5 pl-3 mt-3">
           <div className="form-group w-100">
             <label className="text-secondary" for="exampleInputEmail1">
               Email
@@ -94,7 +80,7 @@ class AccountCreateForm extends React.Component {
             />
           </div>
         </div>
-        <div className="row pr-5">
+        <div className="row pr-5 pl-3">
           <button
             type="submit"
             onClick={this.createAccount.bind(this)}
@@ -103,14 +89,16 @@ class AccountCreateForm extends React.Component {
             Create Account
           </button>
         </div>
-      </React.Fragment>
+      </div>
     );
   }
 }
 
 class AccountsComponent extends React.Component {
   getAccountsList() {
-    ref.collection("accounts").onSnapshot(function(querySnapshot) {
+    ref.collection("accounts")
+    .where("userType", "==", "subAdmin")
+    .onSnapshot(function(querySnapshot) {
       let objects = [];
       querySnapshot.forEach(function(doc) {
         // doc.data() is never undefined for query doc snapshots
@@ -131,6 +119,12 @@ class AccountsComponent extends React.Component {
       );
     });
   }
+  createAccount(){
+    ReactDOM.render(
+      <AccountCreateForm/>,
+      document.querySelector("#featuresColumn")
+    )
+  }
   componentDidMount() {
     this.getAccountsList();
   }
@@ -139,7 +133,12 @@ class AccountsComponent extends React.Component {
     return (
       <React.Fragment>
         <div className="row m-2 mt-3 text-dark">
+          <div className = "col">
           <h3>Accounts</h3>
+          </div>
+          <div className = "col">
+          <button type="button" class="btn btn-info" onClick = {this.createAccount.bind(this)}>Add Account</button>
+          </div>
         </div>
         <div className="list-group" id="accountsList" />
       </React.Fragment>
@@ -149,14 +148,15 @@ class AccountsComponent extends React.Component {
 
 class AccountsItem extends React.Component {
   state = {
-    categoryName: "Not Set Yet"
+    categoryName: "Not Set Yet",
+    objProp:this.props
   };
   getCategoryName() {
     let sup = this;
-    if (this.props.categoryId != null) {
+    if (this.state.objProp.categoryId != null) {
       ref
         .collection("announcementCategory")
-        .doc(this.props.categoryId)
+        .doc(this.state.objProp.categoryId)
         .onSnapshot(function(querySnapshot) {
           sup.setState({
             categoryName: querySnapshot.data().categoryName
@@ -164,73 +164,149 @@ class AccountsItem extends React.Component {
         });
     }
   }
-updateAccount(){
+  updateAccount() {
     ReactDOM.render(
-        <UpdateAccount/>,document.querySelector("#featuresColumn")
-    )
-}
+      <UpdateAccount
+        email={this.state.objProp.email}
+        category={this.state.categoryName}
+        uid={this.state.objProp.id}
+      />,
+      document.querySelector("#featuresColumn")
+    );
+  }
   componentDidMount() {
     this.getCategoryName();
-    
   }
-
 
   render() {
     return (
-    <React.Fragment>
-    
-      <div className="list-item row m-2 p-3 bg-light">
-        <div className = "col">
-            <div className="row ml-2">{this.props.email}</div>
-            <div className="row ml-2">{this.state.categoryName}</div>
+      <React.Fragment>
+        <div className="list-item row m-2 p-3 bg-light">
+          <div className="col">
+            <div className="row ml-2">{this.state.objProp.email}</div>
+            <div className="row ml-2"><small>{this.state.categoryName}</small></div>
+          </div>
+          <div className="col d-flex flex-row-reverse">
+            <button
+              type="button"
+              onClick={this.updateAccount.bind(this)}
+              class="btn btn-info"
+            >
+              Manage Account
+            </button>
+          </div>
         </div>
-        <div className = "col" onClick = {this.updateAccount.bind(this)}>
-            Manage Account
-        </div>
-      </div>
       </React.Fragment>
     );
   }
 }
 
 class UpdateAccount extends React.Component {
-    state = {  }
-    getCategories(){
-        ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
-            let categoryObjects = [];
-            querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                categoryObjects.push(doc.data());
-            });
-    
-            var listItem = categoryObjects.map((object)=>
-            <OptionItem key = {object.key} id={object.key} value = {object.key} name = {object.categoryName}/>
-            );
-            ReactDOM.render(
-              <React.Fragment>{listItem}</React.Fragment>,document.querySelector("#categoryForAccounts")
-            );
-        });
-    }
-    componentDidMount(){
-        this.getCategories();
-    }
-    render() { 
-        return ( 
-        <React.Fragment>
-            <div className = "row">
-                User Email
-            </div>
-            <div className = "row">
-            <div class="form-group w-100">
-                    <label for="exampleFormControlSelect1">Department Select</label>
-                    <select class="form-control w-100" id="categoryForAccounts">
-                    </select>
+  state = {};
+  getCategories() {
+    ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
+      let categoryObjects = [];
+      querySnapshot.forEach(function(doc) {
+        // doc.data() is never undefined for query doc snapshots
+        categoryObjects.push(doc.data());
+      });
+
+      var listItem = categoryObjects.map(object => (
+        <OptionItem
+          key={object.key}
+          id={object.key}
+          value={object.key}
+          name={object.categoryName}
+        />
+      ));
+      ReactDOM.render(
+        <React.Fragment>{listItem}</React.Fragment>,
+        document.querySelector("#categoryForAccounts")
+      );
+    });
+  }
+
+  updateAccountCategory(){
+    let updatedCatId = $("#categoryForAccounts").val();
+    ref.collection("accounts").doc(this.props.uid).update({
+      "categoryId":updatedCatId
+    });
+    ReactDOM.render(<AccountsComponent/>, document.querySelector("#mainContent"))
+    $("#updateAccountCategoryModal").modal('hide');
+  }
+  componentDidMount() {
+    this.getCategories();
+  }
+  render() {
+    return (
+      <React.Fragment>
+        <div className="row m-3">
+          <h3 className="text-dark">Update Account</h3>
+        </div>
+        <div className="container-fluid shadow m-1 p-2">
+          <div className="row pt-2 m-2">
+            <h3 className="text-info"> {this.props.email}</h3>
+          </div>
+          <div className="row m-2">
+            {this.props.category}{" "}
+            <span data-toggle="modal" data-target="#updateAccountCategoryModal" class="ml-3 p-2 badge badge-secondary">Change</span>
+          </div>
+          <div className="row m-2">
+            <button type="button" class="btn btn-info">
+              Send Reset Password To Email
+            </button>
+          </div>
+        </div>
+        {/* update account category */}
+        <div
+          className="modal fade"
+          id="updateAccountCategoryModal"
+          tabIndex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">
+                  Modal title
+                </h5>
+                <button
+                  type="button"
+                  className="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="row p-2 mt-3">
+                  <div class="form-group w-100">
+                    <label for="exampleFormControlSelect1">
+                      Category Select
+                    </label>
+                    <select class="form-control w-100" id="categoryForAccounts" />
+                  </div>
                 </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Close
+                </button>
+                <button onClick = {this.updateAccountCategory.bind(this)} type="button" className="btn btn-primary">
+                  Save changes
+                </button>
+              </div>
             </div>
-        </React.Fragment>    
-             );
-    }
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  }
 }
- 
-
-

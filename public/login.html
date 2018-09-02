@@ -97,7 +97,6 @@
 	<script src="js/main.js"></script>
 
 	
-
 	<script src="https://www.gstatic.com/firebasejs/5.4.1/firebase.js"></script>
 	<script>
 	  // Initialize Firebase
@@ -109,7 +108,10 @@
 		storageBucket: "announcementsystem-19c49.appspot.com",
 		messagingSenderId: "703465160774"
 	  };
-	  firebase.initializeApp(config);
+	const firebaseApp = firebase.initializeApp(config);
+	const ref = firebaseApp.firestore()
+	ref.settings({timestampsInSnapshots: true})
+	</script>.initializeApp(config);
 	</script>
 	<script src="auth.js"></script>
 

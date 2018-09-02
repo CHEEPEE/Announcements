@@ -15,11 +15,11 @@ function renderRoot() {
     root
   );
 }
-
 class SideNav extends React.Component {
   componentDidMount() {
     ref
       .collection("announcementCategory")
+      
       .orderBy("timestamp")
       .onSnapshot(function(querySnapshot) {
         let categoryObjects = [];
@@ -188,7 +188,9 @@ class MainRoot extends React.Component {
       <React.Fragment>No Announcements</React.Fragment>,
       document.querySelector("#annoucementsList")
     );
-    ref.collection("announcements").orderBy("timestamp").onSnapshot(function(querySnapshot) {
+    ref.collection("announcements")
+    .where("announcementType", "==", "announcement")
+    .orderBy("timestamp").onSnapshot(function(querySnapshot) {
       let categoryObjects = [];
       querySnapshot.forEach(function(doc) {
         // doc.data() is never undefined for query doc snapshots
