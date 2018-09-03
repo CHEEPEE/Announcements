@@ -15,7 +15,7 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
     }
   });
 
-  
+//****************************************************************************************************************/
   class AnnouncementsComtainer extends React.Component {
     state = {
       announcementStatus: "text-info border-bottom p-2 border-info",
@@ -205,13 +205,12 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
       );
     }
   }
-  
+  //****************************************************************************************************************/
   class AnnouncementItem extends React.Component {
     state = {
       deleteEx: "d-none",
       departmentName: "",
-      
-    
+      announcementCredentials:""
     };
     getCategoryName() {
       let sup = this;
@@ -227,6 +226,27 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
             });
           });
       
+    }
+
+    renderUpdate(){
+      ReactDOM.render(
+       
+        <UpdateAnnouncement key = {this.state.announcementCredentials.key}  credentials = {this.state.announcementCredentials}/>
+     
+        ,document.querySelector("#funtionContainer")
+      );
+    }
+    UpdateAnnouncement(){
+      let sup = this;
+      console.log(this.props.id);
+      let id = this.props.id;
+      ref.collection("announcements").doc(id).onSnapshot(function(querySnapshot){
+        console.log(querySnapshot.data());
+        sup.setState({
+          announcementCredentials:querySnapshot.data()
+        });
+        sup.renderUpdate();
+      });
     }
   
     extendDelete() {
@@ -277,6 +297,13 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
             >
               Delete
             </button>
+            <button
+              type="button"
+              class="btn btn-info m-3"
+              onClick = {this.UpdateAnnouncement.bind(this)}
+            >
+              Update
+            </button>
           </div>
           <div className="row pl-3 w-100 mt-1">
             <div
@@ -299,7 +326,7 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
       );
     }
   }
-  
+    //****************************************************************************************************************/
   class AddAnnouncements extends React.Component {
     state = {
       imagePath: "",
@@ -504,14 +531,14 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
     }
   }
 
-  
+    //****************************************************************************************************************/
   class OptionItem extends React.Component {
     state = {};
     render() {
       return <option value={this.props.value}>{this.props.name}</option>;
     }
   }
-  
+    //****************************************************************************************************************/
   class TVitem extends React.Component {
     state = {
       active: this.props.active
@@ -532,7 +559,7 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
       );
     }
   }
-  
+    //****************************************************************************************************************/
   class PictureItem extends React.Component {
     state = {
       active: this.props.active,
@@ -594,4 +621,167 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
       );
     }
   }
-  
+    //****************************************************************************************************************/
+  class UpdateAnnouncement extends React.Component {
+    state = {
+      loadingState:" ",
+      announcementObj:" ",
+      emailValue: this.props.credentials.announcementCaption,
+      imagePath:this.props.credentials.imagePath,
+     
+              filename: name
+    }
+    componentDidMount(){
+      this.setState({
+        announcementId:this.props.credentials.key,
+        emailValue:this.props.credentials.announcementCaption
+      })
+    }
+
+    onfileSelect() {
+      const superb = this;
+      const storageRef = firebase.storage().ref();
+      const file = $("#inputGroupFileUpdate").get(0).files[0];
+      const name = +new Date() + "-" + file.name;
+      const metadata = { contentType: file.type };
+      const task = storageRef
+        .child("announcementsImages")
+        .child(name)
+        .put(file, metadata);
+      task.on(
+        "state_changed",
+        function(snapshot) {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log("Upload is " + progress + "% done");
+          superb.setState({
+            loadingState: "Upload is " + progress + "% done"
+          });
+          switch (snapshot.state) {
+            case firebase.storage.TaskState.PAUSED: // or 'paused'
+              console.log("Upload is paused");
+              break;
+            case firebase.storage.TaskState.RUNNING: // or 'running'
+              console.log("Upload is running");
+              break;
+          }
+        },
+        function(error) {
+          // Handle unsuccessful uploads
+        },
+        function() {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+            superb.setState({
+              imagePath: downloadURL,
+              filename: name
+            });
+            console.log("File available at", downloadURL);
+          });
+        }
+      );
+    }
+
+    saveAnnouncements(){
+      let announcementCaption = $("#announcementCaption").val();
+      let announcementDetails = $("#announcementDetails").val();
+      ref.collection("announcements").doc(this.props.credentials.key).update({
+        announcementCaption:announcementCaption,
+        announcementDetails:announcementDetails,
+        imagePath:this.state.imagePath
+      }).then(function(){
+        ReactDOM.render(
+          <React.Fragment>
+   
+             Updated Successfully
+          </React.Fragment>,
+           document.querySelector("#funtionContainer")
+         )
+      });
+     
+    }
+    render() { 
+      return ( 
+      <React.Fragment>
+          <div className="row pr-5">
+            <h3 className="text-dark">Update {this.props.credentials.announcementType}</h3>
+          </div>
+          
+          <div className="row pr-5  mt-3">
+            <div className="form-group w-100">
+              <label className="text-secondary" for="exampleInputEmail1">
+                Annoucement Caption
+              </label>
+              <input
+                type="text"
+                defaultValue={this.state.emailValue}
+                className="form-control border-0 bg-light"
+                id="announcementCaption"
+                aria-describedby="emailHelp"
+                placeholder="Caption"
+              />
+            </div>
+          </div>
+          <div className="row pr-5  mt-3">
+            <div className="form-group w-100">
+              <label className="text-secondary" for="exampleInputEmail1">
+                Annoucement Description
+              </label>
+              <textarea
+                className="form-control border-0 bg-light"
+                id="announcementDetails"
+                placeholder="Description"
+                rows="7"
+                defaultValue = {this.props.credentials.announcementDetails}
+              >
+           
+            </textarea>
+            </div>
+          </div>
+          <div className="row pr-5  mt-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroupFileAddon01">
+                  Upload
+                </span>
+              </div>
+              <div class="custom-file">
+                <input
+                  type="file"
+                  class="custom-file-input"
+                  id="inputGroupFileUpdate"
+                  onChange={this.onfileSelect.bind(this)}
+                  aria-describedby="inputGroupFileAddon01"
+                />
+                <label class="custom-file-label" for="inputGroupFile01">
+                  Choose file
+                </label>
+              </div>
+            </div>
+          </div>
+          <div className="row pr-5  mt-3">
+            <div className="col-sm-12">
+              <img
+                className="w-100"
+                id="imageToUpload"
+                src={this.state.imagePath}
+              />
+            </div>
+          </div>
+          <div className="row">{this.state.loadingState}</div>
+
+          <div className="row mt-3 pr-5">
+            <button
+              type="submit"
+              onClick = {this.saveAnnouncements.bind(this)}
+              class="btn btn-dark w-100"
+            >
+              Save changes
+            </button>
+          </div>
+      </React.Fragment> );
+    }
+  }
+  //****************************************************************************************************************/

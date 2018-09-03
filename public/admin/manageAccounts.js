@@ -234,6 +234,24 @@ class UpdateAccount extends React.Component {
     ReactDOM.render(<AccountsComponent/>, document.querySelector("#mainContent"))
     $("#updateAccountCategoryModal").modal('hide');
   }
+  sendPasswordReset(){
+    var auth = firebase.auth();
+    var emailAddress = this.props.email;
+
+    auth.sendPasswordResetEmail(emailAddress).then(function() {
+      // Email sent.
+      console.log(emailAddress);
+      ReactDOM.render(
+       <React.Fragment>
+        Email Sent
+       </React.Fragment>,
+        document.querySelector("#featuresColumn")
+      );
+    }).catch(function(error) {
+      // An error happened.
+      console.log(error);
+    });
+  }
   componentDidMount() {
     this.getCategories();
   }
@@ -252,7 +270,7 @@ class UpdateAccount extends React.Component {
             <span data-toggle="modal" data-target="#updateAccountCategoryModal" class="ml-3 p-2 badge badge-secondary">Change</span>
           </div>
           <div className="row m-2">
-            <button type="button" class="btn btn-info">
+            <button type="button" onClick = {this.sendPasswordReset.bind(this)} class="btn btn-info">
               Send Reset Password To Email
             </button>
           </div>

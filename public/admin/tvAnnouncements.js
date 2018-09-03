@@ -38,3 +38,27 @@ class TVAnnouncementContainer extends React.Component {
          );
     }
 }
+
+class CategryContainer extends React.Component {
+    state = {  }
+    render() { 
+        return ( 
+            <div className = "container-fluid">
+
+            </div>
+         );
+    }
+}
+
+
+class CategoryItemSlider extends React.Component {
+    state = {  }
+    render() { 
+        return ( 
+            <div className = "row">
+            
+            </div>
+         );
+    }
+}
+
