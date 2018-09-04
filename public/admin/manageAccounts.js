@@ -98,6 +98,7 @@ class AccountsComponent extends React.Component {
   getAccountsList() {
     ref.collection("accounts")
     .where("userType", "==", "subAdmin")
+    .orderBy("timestamp")
     .onSnapshot(function(querySnapshot) {
       let objects = [];
       querySnapshot.forEach(function(doc) {

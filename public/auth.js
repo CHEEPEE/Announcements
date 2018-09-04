@@ -52,9 +52,9 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
     } else {
       if (
         window.location.href !=
-        "announcementsystem-19c49.firebaseapp.com"
+        "https://announcementsystem-19c49.firebaseapp.com/login.html"
       ) {
-        window.location.href =
+        
         window.location.href = "/login.html";
         console.log("will be logged out");
       }
@@ -97,7 +97,7 @@ function goToAdmin(){
   } else {
     if (
       window.location.href !=
-      "announcementsystem-19c49.firebaseapp.com"
+      "https://announcementsystem-19c49.firebaseapp.com/admin/"
     ) {
       window.location.href = "/admin/";
     }
@@ -118,7 +118,7 @@ function goTosubadmin(){
   } else {
     if (
       window.location.href !=
-      "announcementsystem-19c49.firebaseapp.com"
+      "https://announcementsystem-19c49.firebaseapp.com/subadmin/"
     ) {
       window.location.href = "/subadmin/";
     }
