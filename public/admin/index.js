@@ -10,6 +10,35 @@ class AnnouncementsComtainer extends React.Component {
     announcementStatus: "text-info border-bottom p-2 border-info",
     tvAnnouncementStats: "text-black-50 p-2"
   };
+  getCategories() {
+    ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
+      let categoryObjects = [];
+      querySnapshot.forEach(function(doc) {
+        // doc.data() is never undefined for query doc snapshots
+        categoryObjects.push(doc.data());
+      });
+
+      var listItem = categoryObjects.map(object => (
+        <OptionItem
+          key={object.key}
+          id={object.key}
+          value={object.key}
+          name={object.categoryName}
+        />
+      ));
+      ReactDOM.render(
+        <React.Fragment>
+         <OptionItem
+          key={"filterAll"}
+          id={"all"}
+          value={"all"}
+          name={"All Announcements"}
+        />
+        {listItem}</React.Fragment>,
+        document.querySelector("#categoryForFilter")
+      );
+    });
+  }
   getAnnouncements() {
     ReactDOM.render(
       <AddAnnouncements type = {"announcement"}/>,
@@ -53,14 +82,13 @@ class AnnouncementsComtainer extends React.Component {
         );
       });
   }
-  getTVAnnouncements() {
-    ReactDOM.render(
-      <AddAnnouncements type = {"TVannouncement"}/>,
-      document.querySelector("#funtionContainer")
-    )
+  filterAnnouncementByCategory() {
+    let categoryOption = $("#categoryForFilter").val();
+    if(categoryOption!="all"){
     ref
       .collection("announcements")
-      .where("announcementType", "==", "TVannouncement")
+      .where("announcementType", "==", "announcement")
+      .where("categoryOptions", "==", categoryOption)
       .orderBy("timestamp")
       .onSnapshot(function(querySnapshot) {
         let categoryObjects = [];
@@ -68,81 +96,38 @@ class AnnouncementsComtainer extends React.Component {
           // doc.data() is never undefined for query doc snapshots
 
           var details = doc.data().announcementDetails;
-
+          console.log(details);
           let repdetails = details;
           let obj = {
             key: doc.data().key,
             announcementCaption: doc.data().announcementCaption,
             announcementDetails: repdetails,
-            imagePath: doc.data().imagePath
+            imagePath: doc.data().imagePath,
+            categoryOptions:doc.data().categoryOptions
           };
           categoryObjects.push(obj);
         });
         categoryObjects.reverse();
-        var listItem = categoryObjects.map(function(object, index) {
-          let active = "";
-          if (index == 0) {
-            active = "active";
-          }
-
-          return (
-            <TVitem
-              key={object.key}
-              id={object.key}
-              caption={object.announcementCaption}
-              des={object.announcementDetails}
-              imagePath={object.imagePath}
-              active={active}
-            />
-          );
-        });
-        var picItem = categoryObjects.map(function(object, index) {
-          let active = "";
-          if (index == 0) {
-            active = "active";
-          } else {
-            active = "";
-          }
-
-          return (
-            <PictureItem
-              key={object.key}
-              id={object.key}
-              caption={object.announcementCaption}
-              des={object.announcementDetails}
-              imagePath={object.imagePath}
-              active={active}
-            />
-          );
-        });
-
+        var listItem = categoryObjects.map(object => (
+          <AnnouncementItem
+            key={object.key}
+            id={object.key}
+            categoryId = {object.categoryOptions}
+            caption={object.announcementCaption}
+            des={object.announcementDetails}
+            imagePath={object.imagePath}
+          />
+        ));
         ReactDOM.render(
-          <React.Fragment>
-            <div
-              id="carouselExampleControls"
-              className="carousel slide"
-              data-ride="carousel"
-            >
-              <div className="carousel-inner">{listItem}</div>
-            </div>
-
-            <div className="row mt-3 pl-3 ">
-              <h3 className="text-muted">Slider Items</h3>
-            </div>
-            <div className="container-fluid" id="picItemsContainer" />
-          </React.Fragment>,
+          <React.Fragment>{listItem}</React.Fragment>,
           document.querySelector("#announcementsList")
         );
-
-        ReactDOM.render(
-          <React.Fragment>{picItem}</React.Fragment>,
-          document.querySelector("#picItemsContainer")
-        );
-        $(".carousel").carousel({
-          interval: 2000
-        });
       });
+    }else{
+      this.getAnnouncements();
+    }
   }
+ 
   setAnnouncementActive() {
     this.setState({
       announcementStatus: "text-info border-bottom p-2 border-info",
@@ -150,15 +135,10 @@ class AnnouncementsComtainer extends React.Component {
     });
     this.getAnnouncements();
   }
-  setTVAnnouncementActive() {
-    this.setState({
-      tvAnnouncementStats: "text-info border-bottom p-2 border-info",
-      announcementStatus: "text-black-50 p-2"
-    });
-    this.getTVAnnouncements();
-  }
+
   componentDidMount() {
     this.getAnnouncements();
+    this.getCategories();
   }
   render() {
     return (
@@ -174,18 +154,12 @@ class AnnouncementsComtainer extends React.Component {
               </h3>
             </div>
             <div className="col">
-              <h3
-                onClick={this.setTVAnnouncementActive.bind(this)}
-                className={this.state.tvAnnouncementStats}
-              >
-                TV Annoucement
-              </h3>
             </div>
           </div>
           <div className="row p-2">
             <div class="form-group w-25">
               <label for="exampleFormControlSelect1"><small>Category</small></label>
-              <select class="form-control w-100" id="categoryForFilter" />
+              <select onChange = {this.filterAnnouncementByCategory.bind(this)} class="form-control w-100" id="categoryForFilter" />
             </div>
           </div>
           <div className="row">
@@ -204,6 +178,7 @@ class AnnouncementItem extends React.Component {
   state = {
     deleteEx: "d-none",
     departmentName: "",
+    des:this.props.des
   
   };
   getCategoryName() {
@@ -236,6 +211,13 @@ class AnnouncementItem extends React.Component {
   componentDidMount(){
     this.getCategoryName();
   }
+
+  updateAnnouncement(){
+    ReactDOM.render(
+    <UpdateAnnouncement credentials = {this.props}/>,
+      document.querySelector("#funtionContainer")
+    );
+  }
   render() {
     return (
       <div className="list-group-item text-dark w-100 bg-white shadow-sm border-0 mt-3 list-group-item-action flex-column align-items-start">
@@ -260,7 +242,15 @@ class AnnouncementItem extends React.Component {
           <div className="col-sm-12">
             <small className="text-muted">Announcement / {this.state.departmentName} </small>
           </div>
-          <div className="col-sm-12">{this.props.des}</div>
+          {/* <textarea disabled className="col-sm-12">{this.props.des}</textarea> */}
+          <textarea
+                className="form-control text-dark border-0 bg-white"
+                id="itemannouncementDetails"
+                placeholder="Description"
+                rows = "7"
+                disabled
+                value = {this.props.des}
+              />
         </div>
         <div className="row pl-3">
           <button
@@ -270,6 +260,15 @@ class AnnouncementItem extends React.Component {
           >
             Delete
           </button>
+        
+          <button
+            onClick = {this.updateAnnouncement.bind(this)}
+            type="button"
+            class="btn btn-info m-3"
+          >
+            Update
+          </button>
+         
         </div>
         <div className="row pl-3 w-100 mt-1">
           <div
@@ -526,64 +525,154 @@ class TVitem extends React.Component {
   }
 }
 
-class PictureItem extends React.Component {
-  state = {
-    active: this.props.active,
-    deleteEx: "d-none"
-  };
+class UpdateAnnouncement extends React.Component {
+  state = { 
+    imagePath:this.props.credentials.imagePath
+   }
 
-  extendDelete() {
-    this.setState({
-      deleteEx: this.state.deleteEx == "d-none" ? "visible" : "d-none"
+  saveAnnouncements(){
+    let announcementCaption = $("#announcementCaption").val();
+    let announcementDetails = $("#announcementDetails").val();
+    ref.collection("announcements").doc(this.props.credentials.id).update({
+      announcementCaption:announcementCaption,
+      announcementDetails:announcementDetails,
+      imagePath:this.state.imagePath
+    }).then(function(){
+      ReactDOM.render(
+        <React.Fragment>
+           Updated Successfully
+        </React.Fragment>,
+         document.querySelector("#funtionContainer")
+       )
     });
+   
   }
-  deleteAnnouncement() {
-    ref
-      .collection("announcements")
-      .doc(this.props.id)
-      .delete();
+  onfileSelect() {
+    const superb = this;
+    const storageRef = firebase.storage().ref();
+    const file = $("#inputGroupFileUpdate").get(0).files[0];
+    const name = +new Date() + "-" + file.name;
+    const metadata = { contentType: file.type };
+    const task = storageRef
+      .child("announcementsImages")
+      .child(name)
+      .put(file, metadata);
+    task.on(
+      "state_changed",
+      function(snapshot) {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        superb.setState({
+          loadingState: "Upload is " + progress + "% done"
+        });
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log("Upload is paused");
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log("Upload is running");
+            break;
+        }
+      },
+      function(error) {
+        // Handle unsuccessful uploads
+      },
+      function() {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          superb.setState({
+            imagePath: downloadURL,
+            filename: name
+          });
+          console.log("File available at", downloadURL);
+        });
+      }
+    );
   }
-  render() {
-    return (
-      <div className="row mt-3">
-        <div
-          className="d-block height300 w-100"
-          alt="First slide"
-          style={{
-            backgroundImage: "url(" + this.props.imagePath + ")",
-            backgroundSize: "cover",
-            backgroundPosition: "center"
-          }}
-        >
-          <div className="row">
-            <div className="col">
-              <button
-                type="button"
-                class="btn btn-danger m-3"
-                onClick={this.extendDelete.bind(this)}
-              >
-                Delete
-              </button>
+  render() { 
+    return ( 
+         <React.Fragment>
+          <div className="row pr-5">
+            <h3 className="text-dark">Update</h3>
+          </div>
+          
+          <div className="row pr-5  mt-3">
+            <div className="form-group w-100">
+              <label className="text-secondary" for="exampleInputEmail1">
+                Annoucement Caption
+              </label>
+              <input
+                type="text"
+                defaultValue={this.props.credentials.caption}
+                className="form-control border-0 bg-light"
+                id="announcementCaption"
+                aria-describedby="emailHelp"
+                placeholder="Caption"
+              />
             </div>
-            <div className="col">
-              <div
-                class={"alert alert-danger m-3 " + this.state.deleteEx}
-                role="alert"
+          </div>
+          <div className="row pr-5  mt-3">
+            <div className="form-group w-100">
+              <label className="text-secondary" for="exampleInputEmail1">
+                Annoucement Description
+              </label>
+              <textarea
+                className="form-control border-0 bg-light"
+                id="announcementDetails"
+                placeholder="Description"
+                rows="7"
+                defaultValue = {this.props.credentials.des}
               >
-                <div className="row ">
-                  <div className="col">Delete Slider Item?</div>
-                  <div
-                    className="col text-right text-primary"
-                    onClick={this.deleteAnnouncement.bind(this)}
-                  >
-                    Yes
-                  </div>
-                </div>
+           
+            </textarea>
+            </div>
+          </div>
+          <div className="row pr-5  mt-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroupFileAddon01">
+                  Upload
+                </span>
+              </div>
+              <div class="custom-file">
+                <input
+                  type="file"
+                  class="custom-file-input"
+                  id="inputGroupFileUpdate"
+                  onChange={this.onfileSelect.bind(this)}
+                  aria-describedby="inputGroupFileAddon01"
+                />
+                <label class="custom-file-label" for="inputGroupFile01">
+                  Choose file
+                </label>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    );
+          <div className="row pr-5  mt-3">
+            <div className="col-sm-12">
+              <img
+                className="w-100"
+                id="imageToUpload"
+                src={this.state.imagePath}
+              />
+            </div>
+          </div>
+          <div className="row">{this.state.loadingState}</div>
+
+          <div className="row mt-3 pr-5">
+            <button
+              type="submit"
+              onClick = {this.saveAnnouncements.bind(this)}
+              class="btn btn-dark w-100"
+            >
+              Save changes
+            </button>
+          </div>
+      </React.Fragment>
+     );
   }
 }
+
