@@ -287,7 +287,10 @@ function getAnnouncements(categoryid,categoryName){
       <React.Fragment>{categoryName}</React.Fragment>,
       document.querySelector("#AnnouncementsCategoryName")
        );
-    ref.collection("announcements").where("categoryOptions", "==", categoryid).orderBy("timestamp").onSnapshot(function(querySnapshot) {
+    ref.collection("announcements")
+    .where("categoryOptions", "==", categoryid)
+    .where("announcementType", "==", "announcement")
+    .orderBy("timestamp").onSnapshot(function(querySnapshot) {
       let categoryObjects = [];
       querySnapshot.forEach(function(doc) {
         // doc.data() is never undefined for query doc snapshots

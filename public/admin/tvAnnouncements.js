@@ -6,11 +6,13 @@ function manageTVAnnouncements() {
       </div>
 
       <div className="row m-2">
-        <div className="col-7">
+        <div className="col-7" id = "TVAnnouncementContainer">
           <TVAnnouncementContainer />
         </div>
         <div className="col-5">
-          <div className="p-3 shadow mr-3" id="featuresColumn" />
+          <div className="p-3 shadow mr-3" id="featuresColumn">
+          <h3 className = "text-info">Select Slider to Manage</h3>
+          </div>
         </div>
       </div>
     </React.Fragment>,
@@ -161,14 +163,27 @@ class CategoryItemSlider extends React.Component {
     return (
       <div class={"carousel-item " + this.state.active}>
         <div
-          className="d-block height300"
+          className="d-block bg-white height300"
           alt="First slide"
           style={{
             backgroundImage: "url(" + this.props.imagePath + ")",
             backgroundSize: "cover",
             backgroundPosition: "center"
           }}
-        />
+        >
+        <div className = "row m-3  text-capitalized text-dark p-3">
+          <h1>{this.props.caption}</h1>
+
+          <textarea
+          className = "form-control bg-transparent border-0"
+          defaultValue = {this.props.des}
+          rows = "15"
+          disabled
+          />
+
+        </div>
+        </div>
+        
       </div>
     );
   }
@@ -219,7 +234,7 @@ class ManageSlider extends React.Component {
         <div className="row">
           <h3>{this.props.categoryProperties.categegoryName}</h3>
         </div>
-        <div className="row">
+        <div className="container" id = "manageSliderContainer">
           <AddSlider key = {this.props.categoryProperties.id} categoryProperties = {this.props.categoryProperties} />
         </div>
         <div className="container-fluid" id="sliderItemsList" />
@@ -307,6 +322,11 @@ class AddSlider extends React.Component {
           imagePath: "",
           loadingState: ""
         });
+
+        ReactDOM.render(
+          <TVAnnouncementContainer />,
+          document.querySelector("#TVAnnouncementContainer")
+        )
       })
       .catch(function(error) {
         console.error("Error adding document: ", error);
@@ -410,11 +430,17 @@ class TVSliderItem extends React.Component {
       .doc(this.props.id)
       .delete();
   }
+  updateAnnouncement() {
+    ReactDOM.render(
+      <UpdateTVAnnouncement key = {this.props.id} credentials={this.props} />,
+      document.querySelector("#manageSliderContainer")
+    );
+  }
   render() {
     return (
       <div className="row mt-3">
         <div
-          className="d-block height200 w-100"
+          className="d-block bg-white height200 w-100"
           alt="First slide"
           style={{
             backgroundImage: "url(" + this.props.imagePath + ")",
@@ -430,6 +456,13 @@ class TVSliderItem extends React.Component {
                 onClick={this.extendDelete.bind(this)}
               >
                 Delete
+              </button>
+              <button
+                type="button"
+                class="btn btn-info m-3"
+                onClick = {this.updateAnnouncement.bind(this)}
+              >
+                Update
               </button>
             </div>
             <div className="col">
@@ -449,8 +482,166 @@ class TVSliderItem extends React.Component {
               </div>
             </div>
           </div>
+          <div className = "row text-dark text-capitalized font-weight-bold p-3">
+          {this.props.caption}
+          </div>
         </div>
       </div>
+    );
+  }
+}
+class UpdateTVAnnouncement extends React.Component {
+  state = {
+    imagePath: this.props.credentials.imagePath
+  };
+
+  saveAnnouncements() {
+    let announcementCaption = $("#announcementCaption").val();
+    let announcementDetails = $("#announcementDetails").val();
+    let sup = this;
+    ref
+      .collection("announcements")
+      .doc(this.props.credentials.id)
+      .update({
+        announcementCaption: announcementCaption,
+        announcementDetails: announcementDetails,
+        imagePath: this.state.imagePath
+      })
+      .then(function() {
+        ReactDOM.render(
+          <React.Fragment>
+            <div class="alert alert-success" role="alert">
+              A simple success alert—check it out!
+            </div>
+            <ManageSlider key={sup.props.credentials.id} categoryProperties={sup.props.credentials} />,
+          </React.Fragment>,
+          document.querySelector("#manageSliderContainer")
+        );
+      });
+  }
+  onfileSelect() {
+    const superb = this;
+    const storageRef = firebase.storage().ref();
+    const file = $("#inputGroupFileUpdate").get(0).files[0];
+    const name = +new Date() + "-" + file.name;
+    const metadata = { contentType: file.type };
+    const task = storageRef
+      .child("announcementsImages")
+      .child(name)
+      .put(file, metadata);
+    task.on(
+      "state_changed",
+      function(snapshot) {
+        // Observe state change events such as progress, pause, and resume
+        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log("Upload is " + progress + "% done");
+        superb.setState({
+          loadingState: "Upload is " + progress + "% done"
+        });
+        switch (snapshot.state) {
+          case firebase.storage.TaskState.PAUSED: // or 'paused'
+            console.log("Upload is paused");
+            break;
+          case firebase.storage.TaskState.RUNNING: // or 'running'
+            console.log("Upload is running");
+            break;
+        }
+      },
+      function(error) {
+        // Handle unsuccessful uploads
+      },
+      function() {
+        // Handle successful uploads on complete
+        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+        task.snapshot.ref.getDownloadURL().then(function(downloadURL) {
+          superb.setState({
+            imagePath: downloadURL,
+            filename: name
+          });
+          console.log("File available at", downloadURL);
+        });
+      }
+    );
+  }
+  render() {
+    return (
+      <React.Fragment>
+        <div className="row pr-5">
+          <h3 className="text-dark">Update</h3>
+        </div>
+
+        <div className="row pr-5  mt-3">
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Annoucement Caption
+            </label>
+            <input
+              type="text"
+              defaultValue={this.props.credentials.caption}
+              className="form-control border-0 bg-light"
+              id="announcementCaption"
+              aria-describedby="emailHelp"
+              placeholder="Caption"
+            />
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Annoucement Description
+            </label>
+            <textarea
+              className="form-control border-0 bg-light"
+              id="announcementDetails"
+              placeholder="Description"
+              rows="7"
+              defaultValue={this.props.credentials.des}
+            />
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroupFileAddon01">
+                Upload
+              </span>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                id="inputGroupFileUpdate"
+                onChange={this.onfileSelect.bind(this)}
+                aria-describedby="inputGroupFileAddon01"
+              />
+              <label class="custom-file-label" for="inputGroupFile01">
+                Choose file
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
+          <div className="col-sm-12">
+            <img
+              className="w-100"
+              id="imageToUpload"
+              src={this.state.imagePath}
+            />
+          </div>
+        </div>
+        <div className="row">{this.state.loadingState}</div>
+
+        <div className="row mt-3 pr-5">
+          <button
+            type="submit"
+            onClick={this.saveAnnouncements.bind(this)}
+            class="btn btn-dark w-100"
+          >
+            Save changes
+          </button>
+        </div>
+      </React.Fragment>
     );
   }
 }

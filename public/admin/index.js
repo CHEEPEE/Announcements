@@ -28,22 +28,23 @@ class AnnouncementsComtainer extends React.Component {
       ));
       ReactDOM.render(
         <React.Fragment>
-         <OptionItem
-          key={"filterAll"}
-          id={"all"}
-          value={"all"}
-          name={"All Announcements"}
-        />
-        {listItem}</React.Fragment>,
+          <OptionItem
+            key={"filterAll"}
+            id={"all"}
+            value={"all"}
+            name={"All Announcements"}
+          />
+          {listItem}
+        </React.Fragment>,
         document.querySelector("#categoryForFilter")
       );
     });
   }
   getAnnouncements() {
     ReactDOM.render(
-      <AddAnnouncements type = {"announcement"}/>,
+      <AddAnnouncements type={"announcement"} />,
       document.querySelector("#funtionContainer")
-    )
+    );
     ref
       .collection("announcements")
       .where("announcementType", "==", "announcement")
@@ -61,7 +62,7 @@ class AnnouncementsComtainer extends React.Component {
             announcementCaption: doc.data().announcementCaption,
             announcementDetails: repdetails,
             imagePath: doc.data().imagePath,
-            categoryOptions:doc.data().categoryOptions
+            categoryOptions: doc.data().categoryOptions
           };
           categoryObjects.push(obj);
         });
@@ -70,7 +71,7 @@ class AnnouncementsComtainer extends React.Component {
           <AnnouncementItem
             key={object.key}
             id={object.key}
-            categoryId = {object.categoryOptions}
+            categoryId={object.categoryOptions}
             caption={object.announcementCaption}
             des={object.announcementDetails}
             imagePath={object.imagePath}
@@ -84,50 +85,50 @@ class AnnouncementsComtainer extends React.Component {
   }
   filterAnnouncementByCategory() {
     let categoryOption = $("#categoryForFilter").val();
-    if(categoryOption!="all"){
-    ref
-      .collection("announcements")
-      .where("announcementType", "==", "announcement")
-      .where("categoryOptions", "==", categoryOption)
-      .orderBy("timestamp")
-      .onSnapshot(function(querySnapshot) {
-        let categoryObjects = [];
-        querySnapshot.forEach(function(doc) {
-          // doc.data() is never undefined for query doc snapshots
+    if (categoryOption != "all") {
+      ref
+        .collection("announcements")
+        .where("announcementType", "==", "announcement")
+        .where("categoryOptions", "==", categoryOption)
+        .orderBy("timestamp")
+        .onSnapshot(function(querySnapshot) {
+          let categoryObjects = [];
+          querySnapshot.forEach(function(doc) {
+            // doc.data() is never undefined for query doc snapshots
 
-          var details = doc.data().announcementDetails;
-          console.log(details);
-          let repdetails = details;
-          let obj = {
-            key: doc.data().key,
-            announcementCaption: doc.data().announcementCaption,
-            announcementDetails: repdetails,
-            imagePath: doc.data().imagePath,
-            categoryOptions:doc.data().categoryOptions
-          };
-          categoryObjects.push(obj);
+            var details = doc.data().announcementDetails;
+            console.log(details);
+            let repdetails = details;
+            let obj = {
+              key: doc.data().key,
+              announcementCaption: doc.data().announcementCaption,
+              announcementDetails: repdetails,
+              imagePath: doc.data().imagePath,
+              categoryOptions: doc.data().categoryOptions
+            };
+            categoryObjects.push(obj);
+          });
+          categoryObjects.reverse();
+          var listItem = categoryObjects.map(object => (
+            <AnnouncementItem
+              key={object.key}
+              id={object.key}
+              categoryId={object.categoryOptions}
+              caption={object.announcementCaption}
+              des={object.announcementDetails}
+              imagePath={object.imagePath}
+            />
+          ));
+          ReactDOM.render(
+            <React.Fragment>{listItem}</React.Fragment>,
+            document.querySelector("#announcementsList")
+          );
         });
-        categoryObjects.reverse();
-        var listItem = categoryObjects.map(object => (
-          <AnnouncementItem
-            key={object.key}
-            id={object.key}
-            categoryId = {object.categoryOptions}
-            caption={object.announcementCaption}
-            des={object.announcementDetails}
-            imagePath={object.imagePath}
-          />
-        ));
-        ReactDOM.render(
-          <React.Fragment>{listItem}</React.Fragment>,
-          document.querySelector("#announcementsList")
-        );
-      });
-    }else{
+    } else {
       this.getAnnouncements();
     }
   }
- 
+
   setAnnouncementActive() {
     this.setState({
       announcementStatus: "text-info border-bottom p-2 border-info",
@@ -153,13 +154,18 @@ class AnnouncementsComtainer extends React.Component {
                 Announcements
               </h3>
             </div>
-            <div className="col">
-            </div>
+            <div className="col" />
           </div>
           <div className="row p-2">
             <div class="form-group w-25">
-              <label for="exampleFormControlSelect1"><small>Category</small></label>
-              <select onChange = {this.filterAnnouncementByCategory.bind(this)} class="form-control w-100" id="categoryForFilter" />
+              <label for="exampleFormControlSelect1">
+                <small>Category</small>
+              </label>
+              <select
+                onChange={this.filterAnnouncementByCategory.bind(this)}
+                class="form-control w-100"
+                id="categoryForFilter"
+              />
             </div>
           </div>
           <div className="row">
@@ -167,7 +173,7 @@ class AnnouncementsComtainer extends React.Component {
           </div>
         </div>
         <div className="col-sm-5 mt-3" id="funtionContainer">
-          <AddAnnouncements type = {"announcement"} />
+          <AddAnnouncements type={"announcement"} />
         </div>
       </div>
     );
@@ -178,23 +184,20 @@ class AnnouncementItem extends React.Component {
   state = {
     deleteEx: "d-none",
     departmentName: "",
-    des:this.props.des
-  
+    des: this.props.des
   };
   getCategoryName() {
     let sup = this;
-  
-      ref
-        .collection("announcementCategory")
-        .doc(this.props.categoryId)
-        .onSnapshot(function(querySnapshot) {
-          console.log(querySnapshot.data().categoryName);
-          sup.setState({
-            departmentName: querySnapshot.data().categoryName
-            
-          });
+
+    ref
+      .collection("announcementCategory")
+      .doc(this.props.categoryId)
+      .onSnapshot(function(querySnapshot) {
+        console.log(querySnapshot.data().categoryName);
+        sup.setState({
+          departmentName: querySnapshot.data().categoryName
         });
-    
+      });
   }
 
   extendDelete() {
@@ -208,13 +211,13 @@ class AnnouncementItem extends React.Component {
       .doc(this.props.id)
       .delete();
   }
-  componentDidMount(){
+  componentDidMount() {
     this.getCategoryName();
   }
 
-  updateAnnouncement(){
+  updateAnnouncement() {
     ReactDOM.render(
-    <UpdateAnnouncement credentials = {this.props}/>,
+      <UpdateAnnouncement credentials={this.props} />,
       document.querySelector("#funtionContainer")
     );
   }
@@ -240,17 +243,19 @@ class AnnouncementItem extends React.Component {
 
         <div className="row pl-3">
           <div className="col-sm-12">
-            <small className="text-muted">Announcement / {this.state.departmentName} </small>
+            <small className="text-muted">
+              Announcement / {this.state.departmentName}{" "}
+            </small>
           </div>
           {/* <textarea disabled className="col-sm-12">{this.props.des}</textarea> */}
           <textarea
-                className="form-control text-dark border-0 bg-white"
-                id="itemannouncementDetails"
-                placeholder="Description"
-                rows = "7"
-                disabled
-                value = {this.props.des}
-              />
+            className="form-control text-dark border-0 bg-white"
+            id="itemannouncementDetails"
+            placeholder="Description"
+            rows="7"
+            disabled
+            value={this.props.des}
+          />
         </div>
         <div className="row pl-3">
           <button
@@ -260,15 +265,14 @@ class AnnouncementItem extends React.Component {
           >
             Delete
           </button>
-        
+
           <button
-            onClick = {this.updateAnnouncement.bind(this)}
+            onClick={this.updateAnnouncement.bind(this)}
             type="button"
             class="btn btn-info m-3"
           >
             Update
           </button>
-         
         </div>
         <div className="row pl-3 w-100 mt-1">
           <div
@@ -296,7 +300,7 @@ class AddAnnouncements extends React.Component {
   state = {
     imagePath: "",
     loadingState: "",
-    type:this.props.type
+    type: this.props.type
   };
   getCategories() {
     ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
@@ -526,26 +530,32 @@ class TVitem extends React.Component {
 }
 
 class UpdateAnnouncement extends React.Component {
-  state = { 
-    imagePath:this.props.credentials.imagePath
-   }
+  state = {
+    imagePath: this.props.credentials.imagePath
+  };
 
-  saveAnnouncements(){
+  saveAnnouncements() {
     let announcementCaption = $("#announcementCaption").val();
     let announcementDetails = $("#announcementDetails").val();
-    ref.collection("announcements").doc(this.props.credentials.id).update({
-      announcementCaption:announcementCaption,
-      announcementDetails:announcementDetails,
-      imagePath:this.state.imagePath
-    }).then(function(){
-      ReactDOM.render(
-        <React.Fragment>
-           Updated Successfully
-        </React.Fragment>,
-         document.querySelector("#funtionContainer")
-       )
-    });
-   
+    ref
+      .collection("announcements")
+      .doc(this.props.credentials.id)
+      .update({
+        announcementCaption: announcementCaption,
+        announcementDetails: announcementDetails,
+        imagePath: this.state.imagePath
+      })
+      .then(function() {
+        ReactDOM.render(
+          <React.Fragment>
+            <div class="alert alert-success" role="alert">
+              A simple success alert—check it out!
+            </div>
+            <AddAnnouncements type={"announcement"} />,
+          </React.Fragment>,
+          document.querySelector("#funtionContainer")
+        );
+      });
   }
   onfileSelect() {
     const superb = this;
@@ -592,87 +602,84 @@ class UpdateAnnouncement extends React.Component {
       }
     );
   }
-  render() { 
-    return ( 
-         <React.Fragment>
-          <div className="row pr-5">
-            <h3 className="text-dark">Update</h3>
-          </div>
-          
-          <div className="row pr-5  mt-3">
-            <div className="form-group w-100">
-              <label className="text-secondary" for="exampleInputEmail1">
-                Annoucement Caption
-              </label>
-              <input
-                type="text"
-                defaultValue={this.props.credentials.caption}
-                className="form-control border-0 bg-light"
-                id="announcementCaption"
-                aria-describedby="emailHelp"
-                placeholder="Caption"
-              />
-            </div>
-          </div>
-          <div className="row pr-5  mt-3">
-            <div className="form-group w-100">
-              <label className="text-secondary" for="exampleInputEmail1">
-                Annoucement Description
-              </label>
-              <textarea
-                className="form-control border-0 bg-light"
-                id="announcementDetails"
-                placeholder="Description"
-                rows="7"
-                defaultValue = {this.props.credentials.des}
-              >
-           
-            </textarea>
-            </div>
-          </div>
-          <div className="row pr-5  mt-3">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroupFileAddon01">
-                  Upload
-                </span>
-              </div>
-              <div class="custom-file">
-                <input
-                  type="file"
-                  class="custom-file-input"
-                  id="inputGroupFileUpdate"
-                  onChange={this.onfileSelect.bind(this)}
-                  aria-describedby="inputGroupFileAddon01"
-                />
-                <label class="custom-file-label" for="inputGroupFile01">
-                  Choose file
-                </label>
-              </div>
-            </div>
-          </div>
-          <div className="row pr-5  mt-3">
-            <div className="col-sm-12">
-              <img
-                className="w-100"
-                id="imageToUpload"
-                src={this.state.imagePath}
-              />
-            </div>
-          </div>
-          <div className="row">{this.state.loadingState}</div>
+  render() {
+    return (
+      <React.Fragment>
+        <div className="row pr-5">
+          <h3 className="text-dark">Update</h3>
+        </div>
 
-          <div className="row mt-3 pr-5">
-            <button
-              type="submit"
-              onClick = {this.saveAnnouncements.bind(this)}
-              class="btn btn-dark w-100"
-            >
-              Save changes
-            </button>
+        <div className="row pr-5  mt-3">
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Annoucement Caption
+            </label>
+            <input
+              type="text"
+              defaultValue={this.props.credentials.caption}
+              className="form-control border-0 bg-light"
+              id="announcementCaption"
+              aria-describedby="emailHelp"
+              placeholder="Caption"
+            />
           </div>
+        </div>
+        <div className="row pr-5  mt-3">
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Annoucement Description
+            </label>
+            <textarea
+              className="form-control border-0 bg-light"
+              id="announcementDetails"
+              placeholder="Description"
+              rows="7"
+              defaultValue={this.props.credentials.des}
+            />
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="inputGroupFileAddon01">
+                Upload
+              </span>
+            </div>
+            <div class="custom-file">
+              <input
+                type="file"
+                class="custom-file-input"
+                id="inputGroupFileUpdate"
+                onChange={this.onfileSelect.bind(this)}
+                aria-describedby="inputGroupFileAddon01"
+              />
+              <label class="custom-file-label" for="inputGroupFile01">
+                Choose file
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
+          <div className="col-sm-12">
+            <img
+              className="w-100"
+              id="imageToUpload"
+              src={this.state.imagePath}
+            />
+          </div>
+        </div>
+        <div className="row">{this.state.loadingState}</div>
+
+        <div className="row mt-3 pr-5">
+          <button
+            type="submit"
+            onClick={this.saveAnnouncements.bind(this)}
+            class="btn btn-dark w-100"
+          >
+            Save changes
+          </button>
+        </div>
       </React.Fragment>
-     );
+    );
   }
 }
-

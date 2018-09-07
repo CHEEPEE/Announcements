@@ -232,6 +232,12 @@ class UpdateAccount extends React.Component {
     ref.collection("accounts").doc(this.props.uid).update({
       "categoryId":updatedCatId
     });
+    ReactDOM.render(
+      <AccountCreateForm />,
+      document.querySelector("#featuresColumn")
+    )
+
+
     ReactDOM.render(<AccountsComponent/>, document.querySelector("#mainContent"))
     $("#updateAccountCategoryModal").modal('hide');
   }
@@ -244,7 +250,9 @@ class UpdateAccount extends React.Component {
       console.log(emailAddress);
       ReactDOM.render(
        <React.Fragment>
-        Email Sent
+        <div class="alert alert-success" role="alert">
+            Password Recovery Email Sent!
+          </div>
        </React.Fragment>,
         document.querySelector("#featuresColumn")
       );
