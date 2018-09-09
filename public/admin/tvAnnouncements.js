@@ -108,7 +108,9 @@ class CategryContainer extends React.Component {
           document.querySelector("#sliderItems" + sup.props.id)
         );
         $(".carousel").carousel({
-          interval: 2000
+          interval: 2000,
+          keyboard:true,
+          pause:false
         });
       });
   }
@@ -171,7 +173,7 @@ class CategoryItemSlider extends React.Component {
             backgroundPosition: "center"
           }}
         >
-        <div className = "row m-3  text-capitalized text-dark p-3">
+        <div className = "row m-3  text-capitalized text-dark p-1">
           <h1>{this.props.caption}</h1>
 
           <textarea
@@ -341,14 +343,14 @@ class AddSlider extends React.Component {
         <div className="row pr-5  mt-3">
           <div className="form-group w-100">
             <label className="text-secondary" for="exampleInputEmail1">
-              Annoucement Caption
+              Annoucement Title
             </label>
             <input
               type="email"
               className="form-control border-0 bg-light"
               id="announcementCaption"
               aria-describedby="emailHelp"
-              placeholder="Caption"
+              placeholder="Title"
             />
           </div>
         </div>
@@ -482,8 +484,10 @@ class TVSliderItem extends React.Component {
               </div>
             </div>
           </div>
-          <div className = "row text-dark text-capitalized font-weight-bold p-3">
-          {this.props.caption}
+          <div className = "row text-dark text-capitalized font-weight-bold ml-1 p-3">
+            <h5 className = "text-capitalized ml-1">
+            {this.props.caption}
+            </h5>
           </div>
         </div>
       </div>

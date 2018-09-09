@@ -6,6 +6,14 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
       .collection("accounts")
       .doc(user.uid)
       .onSnapshot(function(querySnapshot) {
+        ref.collection("announcementCategory").doc(querySnapshot.data().categoryId).onSnapshot(function(snap){
+          ReactDOM.render(
+            <React.Fragment>
+              {snap.data().categoryName}
+            </React.Fragment>,
+            document.querySelector("#departmentName")
+          );
+        });
         console.log(querySnapshot.data());
         ReactDOM.render(
           <AnnouncementsComtainer
@@ -14,7 +22,10 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
           document.querySelector("#mainContainer")
         );
       });
+
+
   } else {
+
   }
 });
 
@@ -506,14 +517,14 @@ class AddAnnouncements extends React.Component {
         <div className="row pr-5  mt-3">
           <div className="form-group w-100">
             <label className="text-secondary" for="exampleInputEmail1">
-              Annoucement Caption
+              Annoucement Title
             </label>
             <input
               type="email"
               className="form-control border-0 bg-light"
               id="announcementCaption"
               aria-describedby="emailHelp"
-              placeholder="Caption"
+              placeholder="Title"
             />
           </div>
         </div>
@@ -710,7 +721,7 @@ class PictureItem extends React.Component {
             </div>
             <div className="row h-75">
               <textarea
-                className="form-control h-100 text-dark bg-transparent border-0"
+                className="form-control ml-2 h-100 text-dark bg-transparent border-0"
                 id="itemannouncementDetails"
                 placeholder="Description"
                 disabled

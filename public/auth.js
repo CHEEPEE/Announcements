@@ -22,8 +22,6 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
         categoryId = querySnapshot.data().categoryId;
       }
      });
-
-
     if (user != null) {
       console.log("user identified");
       console.log(user.email);

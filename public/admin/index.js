@@ -424,14 +424,14 @@ class AddAnnouncements extends React.Component {
         <div className="row pr-5  mt-3">
           <div className="form-group w-100">
             <label className="text-secondary" for="exampleInputEmail1">
-              Annoucement Caption
+              Annoucement Title
             </label>
             <input
               type="email"
               className="form-control border-0 bg-light"
               id="announcementCaption"
               aria-describedby="emailHelp"
-              placeholder="Caption"
+              placeholder="Title"
             />
           </div>
         </div>
@@ -612,7 +612,7 @@ class UpdateAnnouncement extends React.Component {
         <div className="row pr-5  mt-3">
           <div className="form-group w-100">
             <label className="text-secondary" for="exampleInputEmail1">
-              Annoucement Caption
+              Annoucement Title
             </label>
             <input
               type="text"
@@ -620,7 +620,7 @@ class UpdateAnnouncement extends React.Component {
               className="form-control border-0 bg-light"
               id="announcementCaption"
               aria-describedby="emailHelp"
-              placeholder="Caption"
+              placeholder="Title"
             />
           </div>
         </div>

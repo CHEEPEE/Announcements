@@ -19,7 +19,9 @@ class SliderOptions extends React.Component {
   }
   getTVAnnouncements(){
       let categoryOptions = $("#categoryOptions").val();
-    ReactDOM.render(<Carousel key = {categoryOptions} categoryId = {categoryOptions} />, document.querySelector("#app"));
+      let interval = $("#sliderInterval").val();
+      $("#SliderOptions").modal("toggle");
+      ReactDOM.render(<Carousel key = {categoryOptions+interval} interval = {interval*1000} categoryId = {categoryOptions} />, document.querySelector("#app"));
   }
 
   getCategories() {
@@ -76,6 +78,10 @@ class SliderOptions extends React.Component {
                     <option>Select Slider Category</option>
                   </select>
                 </div>
+                <div className = "row p-3">
+                  <label for="exampleInputEmail1">Slider Interval (Seconds)</label>
+                  <input type="number" defaultValue = {60} class="form-control" id="sliderInterval" aria-describedby="emailHelp" placeholder="Slider Interval (Seconds)"/>
+                </div>
               </div>
               <div className="modal-footer">
                 <button
@@ -85,7 +91,7 @@ class SliderOptions extends React.Component {
                 >
                   Close
                 </button>
-                <button type="button" className="btn btn-primary">
+                <button type="button" onClick = {this.getTVAnnouncements.bind(this)} className="btn btn-primary">
                   Save changes
                 </button>
               </div>
@@ -99,9 +105,12 @@ class SliderOptions extends React.Component {
 
 ReactDOM.render(<SliderOptions />, document.querySelector("#options"));
 class Carousel extends React.Component {
-  state = {};
+  state = {
+    interval:this.props.interval
+  };
 
   getTVAnnouncements() {
+    let sup = this;
     ref
       .collection("announcements")
       .where("announcementType", "==", "TVannouncement")
@@ -147,7 +156,7 @@ class Carousel extends React.Component {
         );
        
         $(".carousel").carousel({
-          interval: 2000,
+          interval: sup.state.interval,
           keyboard:true,
           pause:false
         });
@@ -193,7 +202,14 @@ class CarouselItem extends React.Component {
             </h1>
           </div>
           <div className="row">
-            <div className="announcement-des">{this.props.des}</div>
+            {/* <div className="announcement-des">{this.props.des}</div> */}
+            <textarea
+              className="form-control announcement-des border-0 bg-transparent"
+              disabled
+              placeholder="Description"
+              defaultValue = {this.props.des}
+              rows="22"
+            />
           </div>
         </div>
       </div>

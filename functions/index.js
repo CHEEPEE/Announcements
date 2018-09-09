@@ -23,18 +23,36 @@ exports.sendWelcomeEmail = functions.auth.user().onCreate((user) => {
     })
   });
 
-  exports.myFunctionName = functions.firestore
+  exports.createUser = functions.firestore
   .document('users/createUser').onWrite((change, context) => {
     // ... Your code here
     console.log(change.after.data());
     let email = change.after.data().email;
     let password = change.after.data().password;
-    admin.auth().createUser({
+    return admin.auth().createUser({
         email: email,
         emailVerified: true,
         password: password,
         disabled: false
     })
+  });
+
+  exports.deleteUser = functions.firestore
+  .document('users/deleteUser').onWrite((change, context) => {
+    // ... Your code here
+    console.log(change.after.data());
+    let userId = change.after.data().userId;
+    admin.auth().deleteUser(userId)
+    .then(() => {
+        console.log('User Authentication record deleted');
+        return true;
+    })
+    .catch(() => console.error('Error while trying to delete the user', err));
+  });
+
+  exports.deletUserFromDatabase = functions.auth.user().onDelete((user) => {
+    // ...
+    return firestore.collection("accounts").doc(user.uid).delete();
   });
 
   
