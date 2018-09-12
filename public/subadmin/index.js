@@ -155,12 +155,13 @@ class AnnouncementsComtainer extends React.Component {
             />
           );
         });
+        
 
         ReactDOM.render(
           <React.Fragment>
             <div
               id="carouselExampleControls"
-              className="carousel slide"
+              className="carousel slide height300"
               data-ride="carousel"
             >
               <div className="carousel-inner">
@@ -206,7 +207,9 @@ class AnnouncementsComtainer extends React.Component {
           document.querySelector("#picItemsContainer")
         );
         $(".carousel").carousel({
-          interval: 2000
+          interval: 2000,
+          keyboard: true,
+          pause: false
         });
       });
   }
@@ -667,8 +670,14 @@ class TVitem extends React.Component {
             backgroundPosition: "center"
           }}
         >
-          <h3 className="text-info">{this.props.caption}</h3>
-          <p>{this.props.des}</p>
+          <h3 className="text-info pl-2">{this.props.caption}</h3>
+           <textarea
+                className="form-control h-100 text-dark bg-transparent border-0"
+                placeholder="Description"
+                disabled
+                value={this.props.des}
+              />
+        
         </div>
       </div>
     );
