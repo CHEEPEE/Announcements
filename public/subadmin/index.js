@@ -6,14 +6,15 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
       .collection("accounts")
       .doc(user.uid)
       .onSnapshot(function(querySnapshot) {
-        ref.collection("announcementCategory").doc(querySnapshot.data().categoryId).onSnapshot(function(snap){
-          ReactDOM.render(
-            <React.Fragment>
-              {snap.data().categoryName}
-            </React.Fragment>,
-            document.querySelector("#departmentName")
-          );
-        });
+        ref
+          .collection("announcementCategory")
+          .doc(querySnapshot.data().categoryId)
+          .onSnapshot(function(snap) {
+            ReactDOM.render(
+              <React.Fragment>{snap.data().categoryName}</React.Fragment>,
+              document.querySelector("#departmentName")
+            );
+          });
         console.log(querySnapshot.data());
         ReactDOM.render(
           <AnnouncementsComtainer
@@ -22,10 +23,7 @@ firebaseApp.auth().onAuthStateChanged(function(user) {
           document.querySelector("#mainContainer")
         );
       });
-
-
   } else {
-
   }
 });
 
@@ -256,7 +254,7 @@ class AnnouncementsComtainer extends React.Component {
           </div>
         </div>
         <div className="col-sm-5 mt-3" id="funtionContainer">
-          <AddAnnouncements type={"announcement"} />
+          <AddAnnouncements type={"announcement"} key={"announcement"} />
         </div>
       </div>
     );
@@ -393,7 +391,9 @@ class AddAnnouncements extends React.Component {
   state = {
     imagePath: "",
     loadingState: "",
-    type: this.props.type
+    type: this.props.type,
+    expireVisibility:this.props.type == "TVannouncement" ? "visible":"d-none"
+    
   };
   getCategories() {
     ref.collection("announcementCategory").onSnapshot(function(querySnapshot) {
@@ -426,6 +426,13 @@ class AddAnnouncements extends React.Component {
     let categoryOptions = this.props.categoryId;
     let announcementType = this.props.type;
     let pushKey = ref.collection("announcements").doc().id;
+    let exDate = $("#announcementDate").val();
+    let exTime = $("#announcementTime").val();
+    let expiresAt = dateAndTimeVal(exDate,exTime);
+    if(exTime !="" && exDate == ""){
+      alert("Input Date");
+    }
+    else{  
     ref
       .collection("announcements")
       .doc(pushKey)
@@ -436,11 +443,16 @@ class AddAnnouncements extends React.Component {
         categoryOptions: categoryOptions,
         imagePath: imagePath,
         announcementType: announcementType,
+        exDate:exDate,
+        exTime:exTime,
+        expiresAt:expiresAt,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(function(docRef) {
         $("#announcementCaption").val("");
         $("#announcementDetails").val("");
+        $("#announcementDate").val("");
+        $("#announcementTime").val("");
         sup.setState({
           imagePath: "",
           loadingState: ""
@@ -449,9 +461,17 @@ class AddAnnouncements extends React.Component {
       .catch(function(error) {
         console.error("Error adding document: ", error);
       });
+    }
   }
   componentDidMount() {
     this.getCategories();
+    console.log(this.props.type)
+    let sup = this;
+    setInterval(function(){
+      sup.setState({
+        expireVisibility:sup.props.type == "TVannouncement" ? "visible":"d-none"
+      })
+    },1000)
   }
   onfileSelect() {
     const superb = this;
@@ -539,6 +559,35 @@ class AddAnnouncements extends React.Component {
               placeholder="Description"
               rows="7"
             />
+          </div>
+        </div>
+        <div className={"row pr-5  mt-3 "+this.state.expireVisibility}>
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Set Expiration Date and Time
+            </label>
+            <div className="row">
+              <div className="col">
+                <input
+                  type="date"
+                  className="form-control border-0 bg-light"
+                  id="announcementDate"
+                  
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+              <div className="col">
+                <input
+                  type="time"
+                  
+                  className="form-control border-0 bg-light"
+                  id="announcementTime"
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div className="row pr-5  mt-3">
@@ -742,6 +791,7 @@ class UpdateAnnouncement extends React.Component {
     emailValue: this.props.credentials.announcementCaption,
     imagePath: this.props.credentials.imagePath,
     categoryId: this.props.credentials.categoryId,
+    expireVisibility:this.props.credentials.announcementType == "TVannouncement"?"visible":"d-none",
 
     filename: name
   };
@@ -802,12 +852,23 @@ class UpdateAnnouncement extends React.Component {
     let announcementCaption = $("#announcementCaption").val();
     let announcementDetails = $("#announcementDetails").val();
     let sup = this;
+    let exDate = $("#announcementDate").val();
+    let exTime = $("#announcementTime").val();
+    let expiresAt = dateAndTimeVal(exDate,exTime);
+   
+    if(exTime !="" && exDate == ""){
+      alert("Input Date");
+    }
+    else{    
     ref
       .collection("announcements")
       .doc(this.props.credentials.key)
       .update({
         announcementCaption: announcementCaption,
         announcementDetails: announcementDetails,
+        exDate:exDate,
+        exTime:exTime,
+        expiresAt:expiresAt,
         imagePath: this.state.imagePath
       })
       .then(function() {
@@ -826,6 +887,7 @@ class UpdateAnnouncement extends React.Component {
           document.querySelector("#funtionContainer")
         );
       });
+    }
   }
 
   componentDidMount() {
@@ -867,6 +929,35 @@ class UpdateAnnouncement extends React.Component {
               rows="7"
               defaultValue={this.props.credentials.announcementDetails}
             />
+          </div>
+        </div>
+        <div className={"row pr-5  mt-3 "+this.state.expireVisibility}>
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Set Expiration Date and Time
+            </label>
+            <div className="row">
+              <div className="col">
+                <input
+                  type="date"
+                  className="form-control border-0 bg-light"
+                  id="announcementDate"
+                  defaultValue={this.props.credentials.exDate}
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+              <div className="col">
+                <input
+                  type="time"
+                  defaultValue={this.props.credentials.exTime}
+                  className="form-control border-0 bg-light"
+                  id="announcementTime"
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+            </div>
           </div>
         </div>
         <div className="row pr-5  mt-3">
@@ -915,3 +1006,56 @@ class UpdateAnnouncement extends React.Component {
   }
 }
 //****************************************************************************************************************/
+
+setInterval(function() {
+  console.log(getDateTime());
+  var dt = getDateTime();
+  ref
+    .collection("announcements")
+    .where("announcementType", "==", "TVannouncement")
+    .where("expiresAt", "<=", dt)
+    .get()
+    .then(function(querySnapshot) {
+      querySnapshot.forEach(function(doc) {
+        doc.ref.delete();
+        console.log("delete " + doc.data().announcementCaption);
+      });
+    });
+}, 1000);
+
+function getDateTime() {
+  var now = new Date();
+  var year = now.getFullYear();
+  var month = now.getMonth() + 1;
+  var day = now.getDate();
+  var hour = now.getHours();
+  var minute = now.getMinutes();
+  var second = now.getSeconds();
+  if (month.toString().length == 1) {
+    month = "0" + month;
+  }
+  if (day.toString().length == 1) {
+    day = "0" + day;
+  }
+  if (hour.toString().length == 1) {
+    hour = "0" + hour;
+  }
+  if (minute.toString().length == 1) {
+    minute = "0" + minute;
+  }
+  if (second.toString().length == 1) {
+    second = "0" + second;
+  }
+  var dateTime = year + month + day + hour + minute;
+  return parseInt(dateTime);
+}
+
+function dateAndTimeVal(date, time) {
+  var fTime = time != "" ? time : "0000";
+
+  if (date == "" && time == "") {
+    return "NaN";
+  } else {
+    return parseInt(date.split("-").join("") + time.replace(":", ""));
+  }
+}

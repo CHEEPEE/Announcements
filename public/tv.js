@@ -74,7 +74,7 @@ class SliderOptions extends React.Component {
               </div>
               <div className="modal-body">
                 <div className="row p-3">
-                  <select onChange = {this.getTVAnnouncements.bind(this)} class="form-control" id = "categoryOptions">
+                  <select class="form-control" id = "categoryOptions">
                     <option>Select Slider Category</option>
                   </select>
                 </div>
@@ -216,5 +216,49 @@ class CarouselItem extends React.Component {
     );
   }
 }
+
+setInterval(function(){
+    console.log(getDateTime());
+    var dt = getDateTime();
+    ref
+      .collection("announcements")
+      .where("announcementType", "==", "TVannouncement")
+      .where("expiresAt", "<=", dt)
+      .get().then(function(querySnapshot){
+       
+        querySnapshot.forEach(function(doc) {
+          doc.ref.delete();
+          console.log("delete "+doc.data().announcementCaption);
+  
+        });
+      });
+  }, 1000)
+  
+  function getDateTime() {
+    var now     = new Date(); 
+    var year    = now.getFullYear();
+    var month   = now.getMonth()+1; 
+    var day     = now.getDate();
+    var hour    = now.getHours();
+    var minute  = now.getMinutes();
+    var second  = now.getSeconds(); 
+    if(month.toString().length == 1) {
+         month = '0'+month;
+    }
+    if(day.toString().length == 1) {
+         day = '0'+day;
+    }   
+    if(hour.toString().length == 1) {
+         hour = '0'+hour;
+    }
+    if(minute.toString().length == 1) {
+         minute = '0'+minute;
+    }
+    if(second.toString().length == 1) {
+         second = '0'+second;
+    }   
+    var dateTime = year+month+day+hour+minute;
+     return parseInt(dateTime);
+  }
 
 

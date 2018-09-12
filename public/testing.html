@@ -1,0 +1,19 @@
+<html>
+
+<body>
+
+    <input type="date" id = "getdate" value = "">
+    <input type="time" id = "getTime" >
+</body>
+
+
+<script>
+    function dateAndTimeVal(){
+        var date =  document.getElementById("getdate").value;
+        var time =  document.getElementById("getTime").value;
+        var fTime = time != ""?time:"0000";
+        console.log(date.split("-").join('')+fTime.replace(":",""));
+        }
+    
+</script>
+</html>

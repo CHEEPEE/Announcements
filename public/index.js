@@ -207,15 +207,19 @@ class MainRoot extends React.Component {
         categoryObjects.push(obj);
       });
       categoryObjects.reverse();
-      var listItem = categoryObjects.map(object => (
-        <AnnouncementItem
-          key={object.key}
-          id={object.key}
-          caption={object.announcementCaption}
-          des={object.announcementDetails}
-          imagePath = {object.imagePath}
-        />
-      ));
+      var listItem = categoryObjects.map(function (object){
+        var des_lines =  object.announcementDetails.split(/\r\n|\r|\n/).length;
+        console.log(des_lines);
+        return <AnnouncementItem
+        key={object.key}
+        id={object.key}
+        row= {des_lines}
+        caption={object.announcementCaption}
+        des={object.announcementDetails}
+        imagePath = {object.imagePath}
+      />
+      }
+      );
       ReactDOM.render(
         <React.Fragment>{listItem}</React.Fragment>,
         document.querySelector("#annoucementsList")
@@ -232,7 +236,7 @@ class MainRoot extends React.Component {
         <h1 className = "text-dark font-weight-light pl-3" id = "AnnouncementsCategoryName">{this.props.category}</h1>
         </div>
         <div className="row pb-5">
-          <div class="list-group" id="annoucementsList" role="tablist" />
+          <div class="list-group w-100" id="annoucementsList" role="tablist" />
         </div>
       </React.Fragment>
     );
@@ -243,6 +247,7 @@ class MainRoot extends React.Component {
 
 class AnnouncementItem extends React.Component {
   state = {};
+  
   render() {
     return (
       <React.Fragment>
@@ -264,8 +269,15 @@ class AnnouncementItem extends React.Component {
             <small className="text-info"></small>
           </div>
           <div className="row">
-            <div className = "text-justify">
-            {this.props.des}
+            <div className = "text-justify w-100">
+            <textarea
+            className="form-control w-100 text-area-des text-dark border-0 bg-white"
+            id="itemannouncementDetails"
+            placeholder="Description"
+            rows ={this.props.row}
+            disabled
+            defaultValue={this.props.des}
+          />   
             </div>
           </div>
         </div>

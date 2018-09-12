@@ -6,12 +6,12 @@ function manageTVAnnouncements() {
       </div>
 
       <div className="row m-2">
-        <div className="col-7" id = "TVAnnouncementContainer">
+        <div className="col-7" id="TVAnnouncementContainer">
           <TVAnnouncementContainer />
         </div>
         <div className="col-5">
           <div className="p-3 shadow mr-3" id="featuresColumn">
-          <h3 className = "text-info">Select Slider to Manage</h3>
+            <h3 className="text-info">Select Slider to Manage</h3>
           </div>
         </div>
       </div>
@@ -109,8 +109,8 @@ class CategryContainer extends React.Component {
         );
         $(".carousel").carousel({
           interval: 2000,
-          keyboard:true,
-          pause:false
+          keyboard: true,
+          pause: false
         });
       });
   }
@@ -173,19 +173,17 @@ class CategoryItemSlider extends React.Component {
             backgroundPosition: "center"
           }}
         >
-        <div className = "row m-3  text-capitalized text-dark p-1">
-          <h1>{this.props.caption}</h1>
+          <div className="row m-3  text-capitalized text-dark p-1">
+            <h1>{this.props.caption}</h1>
 
-          <textarea
-          className = "form-control bg-transparent border-0"
-          defaultValue = {this.props.des}
-          rows = "15"
-          disabled
-          />
-
+            <textarea
+              className="form-control bg-transparent border-0"
+              defaultValue={this.props.des}
+              rows="15"
+              disabled
+            />
+          </div>
         </div>
-        </div>
-        
       </div>
     );
   }
@@ -193,7 +191,7 @@ class CategoryItemSlider extends React.Component {
 
 class ManageSlider extends React.Component {
   state = {};
-  
+
   getSliderItems() {
     ref
       .collection("announcements")
@@ -217,6 +215,8 @@ class ManageSlider extends React.Component {
               caption={object.announcementCaption}
               des={object.announcementDetails}
               imagePath={object.imagePath}
+              exDate = {object.exDate}
+              exTime = {object.exTime}
             />
           );
         });
@@ -236,8 +236,11 @@ class ManageSlider extends React.Component {
         <div className="row">
           <h3>{this.props.categoryProperties.categegoryName}</h3>
         </div>
-        <div className="container" id = "manageSliderContainer">
-          <AddSlider key = {this.props.categoryProperties.id} categoryProperties = {this.props.categoryProperties} />
+        <div className="container" id="manageSliderContainer">
+          <AddSlider
+            key={this.props.categoryProperties.id}
+            categoryProperties={this.props.categoryProperties}
+          />
         </div>
         <div className="container-fluid" id="sliderItemsList" />
       </div>
@@ -246,11 +249,11 @@ class ManageSlider extends React.Component {
 }
 
 class AddSlider extends React.Component {
-    state = {
-        imagePath: "",
-        loadingState: "",
-        type:"TVannouncement"
-      };
+  state = {
+    imagePath: "",
+    loadingState: "",
+    type: "TVannouncement"
+  };
   onfileSelect() {
     const superb = this;
     const storageRef = firebase.storage().ref();
@@ -305,6 +308,14 @@ class AddSlider extends React.Component {
     let categoryOptions = this.props.categoryProperties.id;
     let announcementType = this.state.type;
     let pushKey = ref.collection("announcements").doc().id;
+    let exDate = $("#announcementDate").val();
+    let exTime = $("#announcementTime").val();
+    let expiresAt = dateAndTimeVal(exDate,exTime);
+   
+    if(exTime !="" && exDate == ""){
+      alert("Input Date");
+    }
+    else{    
     ref
       .collection("announcements")
       .doc(pushKey)
@@ -315,11 +326,16 @@ class AddSlider extends React.Component {
         categoryOptions: categoryOptions,
         imagePath: imagePath,
         announcementType: announcementType,
+        exDate:exDate,
+        exTime:exTime,
+        expiresAt:expiresAt,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       })
       .then(function(docRef) {
         $("#announcementCaption").val("");
         $("#announcementDetails").val("");
+        $("#announcementDate").val("");
+        $("#announcementTime").val("");
         sup.setState({
           imagePath: "",
           loadingState: ""
@@ -328,11 +344,13 @@ class AddSlider extends React.Component {
         ReactDOM.render(
           <TVAnnouncementContainer />,
           document.querySelector("#TVAnnouncementContainer")
-        )
+        );
       })
       .catch(function(error) {
         console.error("Error adding document: ", error);
       });
+
+    }
   }
   render() {
     return (
@@ -368,6 +386,35 @@ class AddSlider extends React.Component {
           </div>
         </div>
         <div className="row pr-5  mt-3">
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Set Expiration Date and Time
+            </label>
+            <div className="row">
+              <div className="col">
+                <input
+                  type="date"
+                  className="form-control border-0 bg-light"
+                  id="announcementDate"
+                  
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+              <div className="col">
+                <input
+                  type="time"
+                 
+                  className="form-control border-0 bg-light"
+                  id="announcementTime"
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text" id="inputGroupFileAddon01">
@@ -398,7 +445,7 @@ class AddSlider extends React.Component {
           </div>
         </div>
         <div className="row">{this.state.loadingState}</div>
-       
+
         <div className="row mt-3 pr-5">
           <button
             type="submit"
@@ -418,7 +465,7 @@ class TVSliderItem extends React.Component {
     deleteEx: "d-none",
     imagePath: "",
     loadingState: "",
-    type:"TVannouncement"
+    type: "TVannouncement"
   };
 
   extendDelete() {
@@ -434,7 +481,7 @@ class TVSliderItem extends React.Component {
   }
   updateAnnouncement() {
     ReactDOM.render(
-      <UpdateTVAnnouncement key = {this.props.id} credentials={this.props} />,
+      <UpdateTVAnnouncement key={this.props.id} credentials={this.props} />,
       document.querySelector("#manageSliderContainer")
     );
   }
@@ -462,7 +509,7 @@ class TVSliderItem extends React.Component {
               <button
                 type="button"
                 class="btn btn-info m-3"
-                onClick = {this.updateAnnouncement.bind(this)}
+                onClick={this.updateAnnouncement.bind(this)}
               >
                 Update
               </button>
@@ -484,10 +531,8 @@ class TVSliderItem extends React.Component {
               </div>
             </div>
           </div>
-          <div className = "row text-dark text-capitalized font-weight-bold ml-1 p-3">
-            <h5 className = "text-capitalized ml-1">
-            {this.props.caption}
-            </h5>
+          <div className="row text-dark text-capitalized font-weight-bold ml-1 p-3">
+            <h5 className="text-capitalized ml-1">{this.props.caption}</h5>
           </div>
         </div>
       </div>
@@ -502,6 +547,12 @@ class UpdateTVAnnouncement extends React.Component {
   saveAnnouncements() {
     let announcementCaption = $("#announcementCaption").val();
     let announcementDetails = $("#announcementDetails").val();
+    let exDate = $("#announcementDate").val();
+    let exTime = $("#announcementTime").val();
+    let expiresAt = dateAndTimeVal(exDate,exTime);
+    if(exTime !=null && exDate == ""){
+      alert("Input Date");
+    }else{
     let sup = this;
     ref
       .collection("announcements")
@@ -509,6 +560,9 @@ class UpdateTVAnnouncement extends React.Component {
       .update({
         announcementCaption: announcementCaption,
         announcementDetails: announcementDetails,
+        exDate:exDate,
+        exTime:exTime,
+        expiresAt:expiresAt,
         imagePath: this.state.imagePath
       })
       .then(function() {
@@ -517,11 +571,17 @@ class UpdateTVAnnouncement extends React.Component {
             <div class="alert alert-success" role="alert">
               A simple success alert—check it out!
             </div>
-            <ManageSlider key={sup.props.credentials.id} categoryProperties={sup.props.credentials} />,
+            <ManageSlider
+              key={sup.props.credentials.id}
+              categoryProperties={sup.props.credentials}
+            />
+            ,
           </React.Fragment>,
           document.querySelector("#manageSliderContainer")
         );
       });
+
+    }
   }
   onfileSelect() {
     const superb = this;
@@ -605,6 +665,35 @@ class UpdateTVAnnouncement extends React.Component {
           </div>
         </div>
         <div className="row pr-5  mt-3">
+          <div className="form-group w-100">
+            <label className="text-secondary" for="exampleInputEmail1">
+              Set Expiration Date and Time
+            </label>
+            <div className="row">
+              <div className="col">
+                <input
+                  type="date"
+                  className="form-control border-0 bg-light"
+                  id="announcementDate"
+                  defaultValue={this.props.credentials.exDate}
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+              <div className="col">
+                <input
+                  type="time"
+                  defaultValue={this.props.credentials.exTime}
+                  className="form-control border-0 bg-light"
+                  id="announcementTime"
+                  aria-describedby="emailHelp"
+                  placeholder="Caption"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row pr-5  mt-3">
           <div class="input-group mb-3">
             <div class="input-group-prepend">
               <span class="input-group-text" id="inputGroupFileAddon01">
@@ -648,4 +737,64 @@ class UpdateTVAnnouncement extends React.Component {
       </React.Fragment>
     );
   }
+}
+
+function dateAndTimeVal(date, time) {
+  
+  var fTime = time != "" ? time : "0000";
+
+  if (date == ""&& time == ""){
+    return "NaN";
+  }else{
+    return parseInt(date.split("-").join("") + time.replace(":", ""));
+  }
+    
+}
+
+
+setInterval(function(){
+var dateTime = new Date().toLocaleDateString().split('/').join('') + new Date().toLocaleTimeString('en-US', { hour12: false, 
+  hour: "numeric", 
+  minute: "numeric"}).split(':').join('');
+  console.log(getDateTime());
+  var dt = getDateTime();
+  ref
+    .collection("announcements")
+    .where("announcementType", "==", "TVannouncement")
+    .where("expiresAt", "<=", dt)
+    .get().then(function(querySnapshot){
+     
+      querySnapshot.forEach(function(doc) {
+        doc.ref.delete();
+        console.log("delete "+doc.data().announcementCaption);
+
+      });
+    });
+}, 1000)
+
+function getDateTime() {
+  var now     = new Date(); 
+  var year    = now.getFullYear();
+  var month   = now.getMonth()+1; 
+  var day     = now.getDate();
+  var hour    = now.getHours();
+  var minute  = now.getMinutes();
+  var second  = now.getSeconds(); 
+  if(month.toString().length == 1) {
+       month = '0'+month;
+  }
+  if(day.toString().length == 1) {
+       day = '0'+day;
+  }   
+  if(hour.toString().length == 1) {
+       hour = '0'+hour;
+  }
+  if(minute.toString().length == 1) {
+       minute = '0'+minute;
+  }
+  if(second.toString().length == 1) {
+       second = '0'+second;
+  }   
+  var dateTime = year+month+day+hour+minute;
+   return parseInt(dateTime);
 }
