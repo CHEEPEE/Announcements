@@ -681,7 +681,7 @@ class TVitem extends React.Component {
           <h3 className="text-info pl-2">{this.props.caption}</h3>
            <textarea
                 className="form-control h-100 text-dark bg-transparent border-0"
-                placeholder="Description"
+                
                 disabled
                 value={this.props.des}
               />
@@ -789,7 +789,7 @@ class PictureItem extends React.Component {
               <textarea
                 className="form-control ml-2 h-100 text-dark bg-transparent border-0"
                 id="itemannouncementDetails"
-                placeholder="Description"
+               
                 disabled
                 value={this.props.des}
               />
