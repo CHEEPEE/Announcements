@@ -117,6 +117,7 @@ class Carousel extends React.Component {
       .where("categoryOptions","==",this.props.categoryId)
       .orderBy("timestamp")
       .onSnapshot(function(querySnapshot) {
+        $('.carousel').carousel('dispose');
         let categoryObjects = [];
         querySnapshot.forEach(function(doc) {
           // doc.data() is never undefined for query doc snapshots
@@ -134,11 +135,10 @@ class Carousel extends React.Component {
         });
         categoryObjects.reverse();
         var listItem = categoryObjects.map(function(object, index) {
-          let active = "n";
+          let active = "";
           if (index == 0) {
             active = "active";
           }
-
           return (
             <CarouselItem
               key={object.key}
@@ -147,6 +147,7 @@ class Carousel extends React.Component {
               des={object.announcementDetails}
               imagePath={object.imagePath}
               active={active}
+              indx = {index}
             />
           );
         });
@@ -183,12 +184,12 @@ class Carousel extends React.Component {
 
 class CarouselItem extends React.Component {
   state = {
-    active: this.props.active
+    active: this.props.indx == 0?"h-100 w-100 bg-white carousel-item active":"h-100 w-100 bg-white carousel-item "
   };
   render() {
     return (
       <div
-        className={" h-100 w-100 bg-white carousel-item " + this.state.active}
+        className={this.state.active}
         style={{
           backgroundImage: "url(" + this.props.imagePath + ")",
           backgroundSize: "cover",

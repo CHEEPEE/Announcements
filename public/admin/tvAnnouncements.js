@@ -552,7 +552,7 @@ class UpdateTVAnnouncement extends React.Component {
     let exDate = $("#announcementDate").val();
     let exTime = $("#announcementTime").val();
     let expiresAt = dateAndTimeVal(exDate,exTime);
-    if(exTime !=null && exDate == ""){
+    if(exTime !="" && exDate == ""){
       alert("Input Date");
     }  else if(announcementCaption.split(" ").join("")=="" && announcementCaption.split(" ").join("")=="" && imagePath == ""){
       alert("Announcement Caption or Announcement Description");
