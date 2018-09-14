@@ -314,6 +314,8 @@ class AddSlider extends React.Component {
    
     if(exTime !="" && exDate == ""){
       alert("Input Date");
+    }else if(announcementCaption.split(" ").join("")=="" && announcementCaption.split(" ").join("")=="" && imagePath == ""){
+      alert("Announcement Caption or Announcement Description");
     }
     else{    
     ref
@@ -452,7 +454,7 @@ class AddSlider extends React.Component {
             onClick={this.saveAnnouncements.bind(this)}
             class="btn btn-dark w-100"
           >
-            Add Annoucement
+            Add Announcement
           </button>
         </div>
       </div>
@@ -552,7 +554,11 @@ class UpdateTVAnnouncement extends React.Component {
     let expiresAt = dateAndTimeVal(exDate,exTime);
     if(exTime !=null && exDate == ""){
       alert("Input Date");
-    }else{
+    }  else if(announcementCaption.split(" ").join("")=="" && announcementCaption.split(" ").join("")=="" && imagePath == ""){
+      alert("Announcement Caption or Announcement Description");
+    }
+    
+    else{
     let sup = this;
     ref
       .collection("announcements")

@@ -273,8 +273,7 @@ class AnnouncementItem extends React.Component {
             <textarea
             className="form-control w-100 text-area-des text-dark border-0 bg-white"
             id="itemannouncementDetails"
-            placeholder="Description"
-            rows ={this.props.row}
+            rows ={this.props.row+5}
             disabled
             defaultValue={this.props.des}
           />   

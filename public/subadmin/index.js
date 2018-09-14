@@ -350,7 +350,12 @@ class AnnouncementItem extends React.Component {
               Announcement / {this.state.departmentName}{" "}
             </small>
           </div>
-          <div className="col-sm-12">{this.props.des}</div>
+          <textarea
+              className="form-control bg-transparent border-0"
+              defaultValue={this.props.des}
+              rows="7"
+              disabled
+            />
         </div>
         <div className="row pl-3">
           <button
@@ -434,6 +439,9 @@ class AddAnnouncements extends React.Component {
     let expiresAt = dateAndTimeVal(exDate,exTime);
     if(exTime !="" && exDate == ""){
       alert("Input Date");
+    }
+    else if(announcementCaption.split(" ").join("")=="" && announcementCaption.split(" ").join("")=="" && imagePath == ""){
+      alert("Announcement Caption or Announcement Description");
     }
     else{  
     ref
@@ -637,7 +645,7 @@ class AddAnnouncements extends React.Component {
             onClick={this.saveAnnouncements.bind(this)}
             class="btn btn-dark w-100"
           >
-            Add Annoucement
+            Add Announcement
           </button>
         </div>
       </React.Fragment>

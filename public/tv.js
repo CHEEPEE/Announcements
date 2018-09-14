@@ -134,7 +134,7 @@ class Carousel extends React.Component {
         });
         categoryObjects.reverse();
         var listItem = categoryObjects.map(function(object, index) {
-          let active = "";
+          let active = "n";
           if (index == 0) {
             active = "active";
           }
@@ -206,7 +206,6 @@ class CarouselItem extends React.Component {
             <textarea
               className="form-control announcement-des border-0 bg-transparent"
               disabled
-              placeholder="Description"
               defaultValue = {this.props.des}
               rows="22"
             />

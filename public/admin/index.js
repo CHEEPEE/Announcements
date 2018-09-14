@@ -251,7 +251,6 @@ class AnnouncementItem extends React.Component {
           <textarea
             className="form-control text-dark border-0 bg-white"
             id="itemannouncementDetails"
-            placeholder="Description"
             rows="7"
             disabled
             value={this.props.des}
@@ -333,6 +332,9 @@ class AddAnnouncements extends React.Component {
     let categoryOptions = $("#categoryOptions").val();
     let announcementType = this.props.type;
     let pushKey = ref.collection("announcements").doc().id;
+     if(announcementCaption.split(" ").join("")=="" && announcementCaption.split(" ").join("")=="" && imagePath == ""){
+      alert("Announcement Caption or Announcement Description");
+    }else{
     ref
       .collection("announcements")
       .doc(pushKey)
@@ -356,6 +358,7 @@ class AddAnnouncements extends React.Component {
       .catch(function(error) {
         console.error("Error adding document: ", error);
       });
+    }
   }
   componentDidMount() {
     this.getCategories();
@@ -492,7 +495,7 @@ class AddAnnouncements extends React.Component {
             onClick={this.saveAnnouncements.bind(this)}
             class="btn btn-dark w-100"
           >
-            Add Annoucement
+            Add Announcement
           </button>
         </div>
       </React.Fragment>
