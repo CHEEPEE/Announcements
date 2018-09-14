@@ -109,15 +109,14 @@ class Carousel extends React.Component {
     interval:this.props.interval
   };
 
-  getTVAnnouncements() {
+  announcementGet(){
     let sup = this;
     ref
       .collection("announcements")
       .where("announcementType", "==", "TVannouncement")
       .where("categoryOptions","==",this.props.categoryId)
       .orderBy("timestamp")
-      .onSnapshot(function(querySnapshot) {
-        $('.carousel').carousel('dispose');
+      .get().then(function(querySnapshot) {
         let categoryObjects = [];
         querySnapshot.forEach(function(doc) {
           // doc.data() is never undefined for query doc snapshots
@@ -141,7 +140,7 @@ class Carousel extends React.Component {
           }
           return (
             <CarouselItem
-              key={object.key}
+              key={object.key+index}
               id={object.key}
               caption={object.announcementCaption}
               des={object.announcementDetails}
@@ -161,6 +160,19 @@ class Carousel extends React.Component {
           keyboard:true,
           pause:false
         });
+      });
+
+  }
+
+  getTVAnnouncements() {
+    let sup = this;
+    ref
+      .collection("announcements")
+      .where("announcementType", "==", "TVannouncement")
+      .where("categoryOptions","==",this.props.categoryId)
+      .orderBy("timestamp")
+      .onSnapshot(function(querySnapshot) {
+        sup.announcementGet();
       });
   }
 
